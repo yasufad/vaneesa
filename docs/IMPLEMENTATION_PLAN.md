@@ -22,15 +22,17 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 2: Core UI Shell & Navigation State
 *Goal: The user can navigate between completely empty shell views.*
 
-**Status: 🟡 In Progress (Menus Complete, Theme Complete, Layout Pending)**
+**Status: ✅ Complete**
 
-1. **Zustand Store (Navigation):** Setup global state to track the active view.
-2. **Main Layout Layout:** Build the overarching flex/grid structure containing:
+1. **Zustand Store (Navigation):** ✅ Setup global state to track the active view.
+2. **Main Layout Layout:** ✅ Build the overarching flex/grid structure containing:
     - Native OS Titlebar (Vaneesa uses standard native window frames, not frameless)
-    - Resizable Left Panel (sidebar with vertical tabs)
-    - Status/Toolbar (for current capture state, session name)
-    - Active Viewport
-3. **Empty Views:** Create the empty placeholder React components for Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, and Settings.
+    - Resizable Left Panel (sidebar with vertical tabs) - **240px default, resizable 50-400px**
+    - Status/Toolbar (for current capture state, session name) - **Bottom status bar implemented**
+    - Active Viewport - **Renders current view with Fluent UI**
+3. **Empty Views:** ✅ Create the empty placeholder React components for Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, and Settings.
+    - All 7 views implemented as placeholder components
+    - SettingsView includes capture settings and detector threshold UI (sliders, dropdowns, switches)
 4. **Native Menus (Go):** ✅ Complete. All menus implemented with Wails v3 native APIs:
     - **File:** New Session (Ctrl+N), Open PCAP (Ctrl+O), Export CSV/JSON, Settings (Ctrl+,), Quit (Ctrl+Q)
     - **Edit:** Standard undo/redo/cut/copy/paste (via Wails role)
@@ -39,6 +41,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
     - **Help:** Documentation/GitHub, Check for Updates, About Vaneesa (native dialog with app icon)
     - All menu items emit Wails events for frontend to handle; About uses native Dialog.Info() API
 5. **Viewport CSS:** ✅ HTML/CSS reset applied to prevent scrollbars and ensure full viewport coverage without margins.
+6. **Theme System:** ✅ Frontend listens to `theme:changed` events and switches Fluent UI theme automatically.
 
 ---
 
