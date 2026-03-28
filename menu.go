@@ -133,8 +133,21 @@ func createApplicationMenu(app *application.App) *application.Menu {
 	helpMenu.AddSeparator()
 
 	helpMenu.Add("About Vaneesa").OnClick(func(ctx *application.Context) {
-		app.Event.Emit("menu:about")
+		showAboutDialog(app)
 	})
 
 	return menu
+}
+
+// showAboutDialog displays a native About dialog with the Vaneesa icon and version information.
+// Uses the platform-native Info dialog with custom icon for consistent UX across platforms.
+func showAboutDialog(app *application.App) {
+	dialog := app.Dialog.Info().
+		SetTitle("About Vaneesa").
+		SetMessage("Vaneesa - Real-time network intelligence dashboard\n\nVersion 0.1.0\n\n© 2026 Yasu Fadhil").
+		SetIcon(appIcon)
+
+	okBtn := dialog.AddButton("OK")
+	dialog.SetDefaultButton(okBtn)
+	dialog.Show()
 }
