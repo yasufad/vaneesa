@@ -2,7 +2,7 @@
 
 This document outlines the phased approach to building Vaneesa from the ground up, moving from the empty repository to a fully functional Wails v3 network monitor.
 
-**Note on Styling:** All UI components will use **Vanilla CSS** for strict control, high performance, and to prevent utility-class clutter, as well as providing premium dark-themed aesthetics.
+**Note on Styling:** All UI components will use **Fluent UI v9 React** to ensure a high-quality, highly accessible, and native-feeling desktop experience with premium dark-themed aesthetics.
 
 ---
 
@@ -13,7 +13,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 1. **Initialise Wails:** Use `wails3 init` to establish the React + TypeScript template.
 2. **Directory Structure:** Organise the `frontend/src` into `components/`, `views/`, `store/`, and `styles/`.
-3. **Vanilla CSS Setup:** Establish global CSS variables (`index.css`) defining the dark-first colour palette (backgrounds, primary/secondary text, alert severities, table borders, typefaces).
+3. **Fluent UI Setup:** Configure the `FluentProvider` with a dark theme and establish global design tokens for the application.
 4. **Service Stubs (Go):** Create the boilerplate structs for `CaptureService`, `FlowService`, `AlertService`, etc., and register them with the Wails application instance.
 
 ---
@@ -40,17 +40,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 ---
 
-## Phase 3: Simulated Data Environment (Mock Data)
-*Goal: Work on the complex UI views without requiring live raw socket capture privileges.*
-
-1. **Zustand Mock Adapters:** Write mock data generators within the frontend that periodically push dummy `TrafficSnapshot` and `Alert` events into the store.
-2. **Populate Dashboard:** Implement Recharts based on simulated metrics. Build the real-time bandwidth charts and top talker lists.
-3. **Virtualised Connection Table:** Implement the TanStack Virtual scrolling table in the `Connections` view, populated by mock flows.
-4. **Context Menus:** Wire Wails native Context Menus to react to right-clicks on the mock table rows.
-
----
-
-## Phase 4: Backend Database & Configuration Layer
+## Phase 3: Backend Database & Configuration Layer
 *Goal: Prepare the static, non-capture backend.*
 
 1. **SQLite Database:** Include `modernc.org/sqlite` and define the raw SQL startup migrations.
@@ -59,17 +49,17 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 ---
 
-## Phase 5: The Capture Pipeline Core
+## Phase 4: The Capture Pipeline Core
 *Goal: The most critical phase: reading bytes off the network interface.*
 
 1. **Pcap Integration:** Write the goroutine that uses `gopacket` / `pcap` to open an interface.
 2. **Packet Processor:** Build the pool of decoders that extract L3/L4 metadata into `ParsedPacket` structs.
 3. **Traffic Aggregator:** Implement the 1000ms ticker that converts `ParsedPacket` streams into a unified `TrafficSnapshot`.
-4. **Connect to Frontend:** Disconnect the mock frontend adaptors and bind them directly to the `vaneesa:snapshot` events coming from the real Go backend Emitter.
+4. **Connect to Frontend:** Bind the frontend store directly to the `vaneesa:snapshot` events coming from the Go backend Emitter.
 
 ---
 
-## Phase 6: Anomaly Detection
+## Phase 5: Anomaly Detection
 *Goal: Bring intelligence to the raw traffic data.*
 
 1. **Detector Ticker:** Insert the Detector logic between the Aggregator and the Emitter.
@@ -79,7 +69,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 ---
 
-## Phase 7: Polish & PCAP Replay
+## Phase 6: Polish & PCAP Replay
 *Goal: Finalise workflows and add offline session support.*
 
 1. **PCAP Loader:** Implement `gopacket`'s offline PCAP reader stream, feeding into the exact same Capture Pipeline infrastructure.
