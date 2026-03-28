@@ -1,0 +1,28 @@
+# Credits
+
+- [Lea Anthony](https://github.com/leaanthony) - Project owner, lead developer
+- [Stffabi](https://github.com/stffabi) - Technical lead, developer and maintainer
+- [Travis McLane](https://github.com/tmclane) - Cross-compilation work, MacOS testing
+- [Atterpac](https://github.com/atterpac) - Developer, support guru, powerhouse
+- [Simon Thomas](mailto:enquiries@wails.io) - Growth Hacker
+- [Lyimmi](https://github.com/Lyimmi) - All things Linux
+- [fbbdev](https://github.com/fbbdev) - Bindings Generator guru & core contributor
+
+## Sponsors
+
+Special thanks to our sponsors for their support.
+
+## Contributors
+
+See the contributors page for a full list of contributors.
+
+## Special Mentions
+
+- [John Chadwick](https://github.com/jchv) - His amazing work on [go-webview2](https://github.com/jchv/go-webview2) and [go-winloader](https://github.com/jchv/go-winloader) have made the Windows version possible.
+- [Tad Vizbaras](https://github.com/tadvi) - His winc project was the first step down the path to a pure Go Wails.
+- [Mat Ryer](https://github.com/matryer) - For advice, support and bants.
+- [Byron Chris](https://github.com/bh90210) - For his long term contributions to this project.
+- [Dustin Krysak](https://wiki.ubuntu.com/bashfulrobot) - His support and feedback has been invaluable.
+- [Justen Walker](https://github.com/justenwalker/) - For helping wrangle COM issues which got v2 over the line.
+- [Wang, Chi](https://github.com/patr0nus/) - The DeskGap project was a huge influence on the direction of Wails v2.
+- [Serge Zaitsev](https://github.com/zserge) - Whilst Wails does not use the Webview project, it is still a source of inspiration.

@@ -1,0 +1,446 @@
+# Clipboard Operations
+
+Copy and paste text with the system clipboard.
+
+Wails provides a **unified clipboard API** that works across all platforms. Copy and paste text with simple, consistent methods on Windows, macOS, and Linux.
+
+---
+
+## Quick Start
+
+```go
+// Copy text to clipboard
+app.Clipboard.SetText("Hello, World!")
+
+// Get text from clipboard
+text, ok := app.Clipboard.Text()
+if ok {
+    fmt.Println("Clipboard:", text)
+}
+```
+
+---
+
+## Copying Text
+
+### Basic Copy
+
+```go
+success := app.Clipboard.SetText("Text to copy")
+if !success {
+    app.Logger.Error("Failed to copy to clipboard")
+}
+```
+
+Returns `bool` — `true` if successful, `false` otherwise.
+
+### Copy from Service
+
+```go
+type ClipboardService struct {
+    app *application.Application
+}
+
+func (c *ClipboardService) CopyToClipboard(text string) bool {
+    return c.app.Clipboard.SetText(text)
+}
+```
+
+```javascript
+import { CopyToClipboard } from './bindings/myapp/clipboardservice'
+
+await CopyToClipboard("Text to copy")
+```
+
+### Copy with Feedback
+
+```go
+func copyWithFeedback(text string) {
+    if app.Clipboard.SetText(text) {
+        app.Dialog.Info().
+            SetTitle("Copied").
+            SetMessage("Text copied to clipboard!").
+            Show()
+    } else {
+        app.Dialog.Error().
+            SetTitle("Copy Failed").
+            SetMessage("Failed to copy to clipboard.").
+            Show()
+    }
+}
+```
+
+---
+
+## Pasting Text
+
+### Basic Paste
+
+```go
+text, ok := app.Clipboard.Text()
+if !ok {
+    app.Logger.Error("Failed to read clipboard")
+    return
+}
+
+fmt.Println("Clipboard text:", text)
+```
+
+Returns `(string, bool)` — text and success flag.
+
+### Paste from Service
+
+```go
+func (c *ClipboardService) PasteFromClipboard() string {
+    text, ok := c.app.Clipboard.Text()
+    if !ok {
+        return ""
+    }
+    return text
+}
+```
+
+```javascript
+import { PasteFromClipboard } from './bindings/myapp/clipboardservice'
+
+const text = await PasteFromClipboard()
+console.log("Pasted:", text)
+```
+
+### Paste with Validation
+
+```go
+func pasteText() (string, error) {
+    text, ok := app.Clipboard.Text()
+    if !ok {
+        return "", errors.New("clipboard empty or unavailable")
+    }
+
+    if len(text) == 0 {
+        return "", errors.New("clipboard is empty")
+    }
+
+    if len(text) > 10000 {
+        return "", errors.New("clipboard text too large")
+    }
+
+    return text, nil
+}
+```
+
+---
+
+## Complete Examples
+
+### Copy Button
+
+**Go:**
+
+```go
+type TextService struct {
+    app *application.Application
+}
+
+func (t *TextService) CopyText(text string) error {
+    if !t.app.Clipboard.SetText(text) {
+        return errors.New("failed to copy")
+    }
+    return nil
+}
+```
+
+**JavaScript:**
+
+```javascript
+import { CopyText } from './bindings/myapp/textservice'
+
+async function copyToClipboard(text) {
+    try {
+        await CopyText(text)
+        showNotification("Copied to clipboard!")
+    } catch (error) {
+        showError("Failed to copy: " + error)
+    }
+}
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+    const text = document.getElementById('text').value
+    copyToClipboard(text)
+})
+```
+
+### Paste and Process
+
+**Go:**
+
+```go
+type DataService struct {
+    app *application.Application
+}
+
+func (d *DataService) PasteAndProcess() (string, error) {
+    text, ok := d.app.Clipboard.Text()
+    if !ok {
+        return "", errors.New("clipboard unavailable")
+    }
+
+    processed := strings.TrimSpace(text)
+    processed = strings.ToUpper(processed)
+
+    return processed, nil
+}
+```
+
+**JavaScript:**
+
+```javascript
+import { PasteAndProcess } from './bindings/myapp/dataservice'
+
+async function pasteAndProcess() {
+    try {
+        const result = await PasteAndProcess()
+        document.getElementById('output').value = result
+    } catch (error) {
+        showError("Failed to paste: " + error)
+    }
+}
+```
+
+### Copy Multiple Formats
+
+```go
+type CopyService struct {
+    app *application.Application
+}
+
+func (c *CopyService) CopyAsPlainText(text string) bool {
+    return c.app.Clipboard.SetText(text)
+}
+
+func (c *CopyService) CopyAsJSON(data interface{}) bool {
+    jsonBytes, err := json.MarshalIndent(data, "", "  ")
+    if err != nil {
+        return false
+    }
+    return c.app.Clipboard.SetText(string(jsonBytes))
+}
+
+func (c *CopyService) CopyAsCSV(rows [][]string) bool {
+    var buf bytes.Buffer
+    writer := csv.NewWriter(&buf)
+
+    for _, row := range rows {
+        if err := writer.Write(row); err != nil {
+            return false
+        }
+    }
+
+    writer.Flush()
+    return c.app.Clipboard.SetText(buf.String())
+}
+```
+
+### Clipboard Monitor
+
+```go
+type ClipboardMonitor struct {
+    app      *application.Application
+    lastText string
+    ticker   *time.Ticker
+    stopChan chan bool
+}
+
+func NewClipboardMonitor(app *application.Application) *ClipboardMonitor {
+    return &ClipboardMonitor{
+        app:      app,
+        stopChan: make(chan bool),
+    }
+}
+
+func (cm *ClipboardMonitor) Start() {
+    cm.ticker = time.NewTicker(1 * time.Second)
+
+    go func() {
+        for {
+            select {
+            case <-cm.ticker.C:
+                cm.checkClipboard()
+            case <-cm.stopChan:
+                return
+            }
+        }
+    }()
+}
+
+func (cm *ClipboardMonitor) Stop() {
+    if cm.ticker != nil {
+        cm.ticker.Stop()
+    }
+    cm.stopChan <- true
+}
+
+func (cm *ClipboardMonitor) checkClipboard() {
+    text, ok := cm.app.Clipboard.Text()
+    if !ok {
+        return
+    }
+
+    if text != cm.lastText {
+        cm.lastText = text
+        cm.app.Event.Emit("clipboard-changed", text)
+    }
+}
+```
+
+### Copy with History
+
+```go
+type ClipboardHistory struct {
+    app     *application.Application
+    history []string
+    maxSize int
+}
+
+func NewClipboardHistory(app *application.Application) *ClipboardHistory {
+    return &ClipboardHistory{
+        app:     app,
+        history: make([]string, 0),
+        maxSize: 10,
+    }
+}
+
+func (ch *ClipboardHistory) Copy(text string) bool {
+    if !ch.app.Clipboard.SetText(text) {
+        return false
+    }
+
+    ch.history = append([]string{text}, ch.history...)
+
+    if len(ch.history) > ch.maxSize {
+        ch.history = ch.history[:ch.maxSize]
+    }
+
+    return true
+}
+
+func (ch *ClipboardHistory) GetHistory() []string {
+    return ch.history
+}
+
+func (ch *ClipboardHistory) RestoreFromHistory(index int) bool {
+    if index < 0 || index >= len(ch.history) {
+        return false
+    }
+
+    return ch.app.Clipboard.SetText(ch.history[index])
+}
+```
+
+---
+
+## Frontend Integration
+
+### Using the Browser Clipboard API
+
+For simple text within the WebView, you can use the browser's native clipboard API:
+
+```javascript
+// Copy
+async function copyText(text) {
+    try {
+        await navigator.clipboard.writeText(text)
+        console.log("Copied!")
+    } catch (error) {
+        console.error("Copy failed:", error)
+    }
+}
+
+// Paste
+async function pasteText() {
+    try {
+        const text = await navigator.clipboard.readText()
+        return text
+    } catch (error) {
+        console.error("Paste failed:", error)
+        return ""
+    }
+}
+```
+
+> The browser clipboard API requires HTTPS or localhost, and user permission.
+
+### Using the Wails Clipboard API
+
+For system-wide clipboard access via Go bindings:
+
+```javascript
+import { CopyToClipboard, PasteFromClipboard } from './bindings/myapp/clipboardservice'
+
+async function copy(text) {
+    const success = await CopyToClipboard(text)
+    if (success) {
+        console.log("Copied!")
+    }
+}
+
+async function paste() {
+    return await PasteFromClipboard()
+}
+```
+
+---
+
+## Best Practices
+
+### Do
+
+- Check return values — handle failures gracefully
+- Provide feedback — let users know a copy succeeded
+- Validate pasted text — check format and size
+- Handle empty clipboard — check before using
+- Trim whitespace — clean pasted text before processing
+
+### Don't
+
+- Don't ignore failures — always check the success return value
+- Don't copy sensitive data — the clipboard is shared system-wide
+- Don't assume format — validate pasted data before use
+- Don't poll too frequently — throttle clipboard monitoring
+- Don't copy large data — use files instead
+- Don't forget to sanitise pasted content for security
+
+---
+
+## Platform Differences
+
+### macOS
+
+- Uses NSPasteboard
+- System-wide clipboard
+- Clipboard history is a system feature
+
+### Windows
+
+- Uses Windows Clipboard API
+- System-wide clipboard
+- Clipboard history available on Windows 10+
+
+### Linux
+
+- Uses X11/Wayland clipboard
+- Has both primary and clipboard selections
+- Behaviour varies by desktop environment
+- May require a clipboard manager to persist content after the app closes
+
+---
+
+## Current Limitations
+
+- **Text only** — image support not yet available
+- **No format detection** — plain text only
+- **No clipboard events** — must poll for changes
+- **No built-in clipboard history** — implement yourself if needed
+
+---
+
+**Resources:** [Discord](https://discord.gg/JDdSxwjhGf) · [Clipboard examples](https://github.com/wailsapp/wails/tree/v3-alpha/v3/examples)
