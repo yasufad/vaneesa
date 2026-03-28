@@ -7,6 +7,9 @@ import { Events } from "@wailsio/runtime";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
+import { Layout } from "./components/Layout";
+import { ViewRenderer } from "./views/ViewRenderer";
+
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
@@ -25,7 +28,9 @@ function App() {
 
   return (
     <FluentProvider theme={theme === "dark" ? webDarkTheme : webLightTheme}>
-      <div style={{ height: "100vh", width: "100vw" }}>{/* App content */}</div>
+      <Layout>
+        <ViewRenderer />
+      </Layout>
     </FluentProvider>
   );
 }
