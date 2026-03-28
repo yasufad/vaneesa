@@ -42,14 +42,14 @@ The format must be: `<type>(<optional scope>): <description>`
 
 All code, documentation, UI text, and comments must use **International English (UK spelling)**.
 
-This applies universally. Treat your code as professional prose.
-*   Use `colour`, not `color` (e.g., `--bg-colour-primary` or `setColour()`).
+This applies universally, **unless an external library, API, or framework explicitly dictates otherwise**. Treat your code as professional prose.
+*   Use `colour`, not `color` (e.g., `--bg-colour-primary` or `setColour()`), unless you are using Tailwind or an API that explicitly demands `color`.
 *   Use `behaviour`, not `behavior`.
 *   Use `analyse`, not `analyze`.
 *   Use `initialise`, not `initialize`.
 *   Use `anomalies`, not `anomolies`.
 
-If your IDE auto-inserts American English terminology, you must override it. 
+If your IDE auto-inserts American English terminology internally, you must override it. However, do not break standard library signatures or framework classes just to force a UK spelling.
 
 ## 4. Development Workflow
 
