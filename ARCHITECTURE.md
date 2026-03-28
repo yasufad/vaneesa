@@ -339,7 +339,7 @@ wails3 dev
 go test ./...
 ```
 
-The frontend can be developed against the live Go backend (`wails3 dev`) or against mocked Zustand state for pure UI work. The mock layer is in `frontend/src/store/mocks/` and can be swapped in by a build flag in `vite.config.ts`.
+The frontend is developed directly against the live Go backend (`wails3 dev`). We build actual functionality step-by-step alongside the UI, avoiding simulated mock environments entirely.
 
 ---
 
