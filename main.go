@@ -12,10 +12,9 @@ import (
 var assets embed.FS
 
 func main() {
-
 	app := application.New(application.Options{
 		Name:        "vaneesa",
-		Description: "",
+		Description: "Real-time network intelligence dashboard",
 		Services:    []application.Service{},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -25,6 +24,10 @@ func main() {
 		},
 	})
 
+	// Create and set the native application menu
+	menu := createApplicationMenu(app)
+	app.Menu.Set(menu)
+
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "Vaneesa",
 		Mac: application.MacWindow{
@@ -32,12 +35,12 @@ func main() {
 			Backdrop:                application.MacBackdropTranslucent,
 			TitleBar:                application.MacTitleBarHiddenInset,
 		},
-		BackgroundColour: application.NewRGB(27, 38, 54),
-		URL:              "/",
+		BackgroundColour:   application.NewRGB(27, 38, 54),
+		URL:                "/",
+		UseApplicationMenu: true,
 	})
 
 	err := app.Run()
-
 	if err != nil {
 		log.Fatal(err)
 	}
