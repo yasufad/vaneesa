@@ -105,6 +105,10 @@ func createApplicationMenu(app *application.App) *application.Menu {
 		app.Event.Emit("menu:zoom", "out")
 	})
 
+	viewMenu.Add("Reset Zoom").SetAccelerator("CmdOrCtrl+0").OnClick(func(ctx *application.Context) {
+		app.Event.Emit("menu:zoom", "reset")
+	})
+
 	viewMenu.AddSeparator()
 
 	fullscreenItem := viewMenu.Add("Toggle Fullscreen")
