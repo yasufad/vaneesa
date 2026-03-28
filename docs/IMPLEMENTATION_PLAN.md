@@ -21,7 +21,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 2: Core UI Shell & Navigation State
 *Goal: The user can navigate between completely empty shell views.*
 
-**Status: 🟡 In Progress (Menus Complete)**
+**Status: 🟡 In Progress (Menus Complete, UI Shell Pending)**
 
 1. **Zustand Store (Navigation):** Setup global state to track the active view.
 2. **Main Layout Layout:** Build the overarching flex/grid structure containing:
@@ -30,13 +30,13 @@ This document outlines the phased approach to building Vaneesa from the ground u
     - Status/Toolbar (for current capture state, session name)
     - Active Viewport
 3. **Empty Views:** Create the empty placeholder React components for Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, and Settings.
-4. **Native Menus (Go):** ✅ Define the basic Wails OS Application Menus (File, Edit, View, Help).
-    - File: New Session, Open PCAP, Export (CSV/JSON), Settings, Quit
-    - Edit: Standard undo/redo/cut/copy/paste (via Wails role)
-    - View: Navigate to all views (Ctrl+1-6), Zoom controls, Fullscreen toggle
-    - Window: Standard window management (via Wails role)
-    - Help: Documentation, Check for Updates, About
-    - All menu items emit Wails events for frontend to handle
+4. **Native Menus (Go):** ✅ Complete. All menus implemented with Wails v3 native APIs:
+    - **File:** New Session (Ctrl+N), Open PCAP (Ctrl+O), Export CSV/JSON, Settings (Ctrl+,), Quit (Ctrl+Q)
+    - **Edit:** Standard undo/redo/cut/copy/paste (via Wails role)
+    - **View:** Navigate to views (Ctrl+1-6), Zoom In/Out/Reset (Ctrl++/Ctrl+-/Ctrl+0), Fullscreen (F11/Cmd+F)
+    - **Window:** Standard window management (via Wails role)
+    - **Help:** Documentation/GitHub, Check for Updates, About Vaneesa (native dialog with app icon)
+    - All menu items emit Wails events for frontend to handle; About uses native Dialog.Info() API
 
 ---
 
