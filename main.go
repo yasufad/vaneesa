@@ -27,9 +27,11 @@ func main() {
 		},
 	})
 
-	// Create and set the native application menu
 	menu := createApplicationMenu(app)
 	app.Menu.Set(menu)
+
+	themeService := NewThemeService(app)
+	app.RegisterService(application.NewService(themeService))
 
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "Vaneesa",
@@ -42,6 +44,10 @@ func main() {
 		URL:                "/",
 		UseApplicationMenu: true,
 	})
+
+	// Emit initial theme after window is created
+	initialTheme := themeService.GetTheme()
+	app.Event.Emit("theme:changed", initialTheme)
 
 	err := app.Run()
 	if err != nil {
