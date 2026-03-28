@@ -1,4 +1,5 @@
 import { useNavigationStore } from "../store/navigation";
+import { SettingsView } from "./SettingsView";
 
 // Placeholder components for each view
 const Dashboard = () => <div>Dashboard View Loading...</div>;
@@ -7,7 +8,6 @@ const Hosts = () => <div>Hosts View Loading...</div>;
 const Protocols = () => <div>Protocols View Loading...</div>;
 const Alerts = () => <div>Alerts View Loading...</div>;
 const Sessions = () => <div>Sessions View Loading...</div>;
-const Settings = () => <div>Settings View Loading...</div>;
 
 export const ViewRenderer = () => {
   const activeView = useNavigationStore((state) => state.activeView);
@@ -26,7 +26,7 @@ export const ViewRenderer = () => {
     case "sessions":
       return <Sessions />;
     case "settings":
-      return <Settings />;
+      return <SettingsView />;
     default:
       return <Dashboard />;
   }
