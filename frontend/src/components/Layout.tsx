@@ -65,8 +65,8 @@ const useStyles = makeStyles({
     alignItems: "center",
     paddingLeft: tokens.spacingHorizontalM,
     paddingRight: tokens.spacingHorizontalM,
-    backgroundColor: tokens.colorBrandBackground2,
-    color: tokens.colorBrandForeground2,
+    backgroundColor: tokens.colorNeutralBackground2,
+    color: tokens.colorNeutralForeground2,
     fontSize: tokens.fontSizeBase200,
     borderTop: `1px solid ${tokens.colorNeutralStroke1}`,
   },
@@ -129,6 +129,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Tab icon={<History24Regular />} value="sessions">
               Sessions
             </Tab>
+          </TabList>
+
+          <div style={{ flex: 1 }} />
+
+          <TabList
+            vertical
+            className={styles.tabList}
+            selectedValue={activeView}
+            onTabSelect={handleTabSelect}
+          >
             <Tab icon={<Settings24Regular />} value="settings">
               Settings
             </Tab>
