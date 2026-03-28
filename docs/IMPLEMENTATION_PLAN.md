@@ -21,8 +21,9 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 1. **Zustand Store (Navigation):** Setup global state to track the active view.
 2. **Main Layout Layout:** Build the overarching flex/grid structure containing:
-    - Custom Titlebar (if frameless)
+    - Native OS Titlebar (Vaneesa uses standard native window frames, not frameless)
     - Sidebar / Activity bar (navigation icons)
+    - Status/Toolbar (for current capture state, session name)
     - Active Viewport
 3. **Empty Views:** Create the empty placeholder React components for Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, and Settings.
 4. **Native Menus (Go):** Define the basic Wails OS Application Menus (File, Edit, View, Help).
