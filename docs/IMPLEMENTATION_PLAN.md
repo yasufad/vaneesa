@@ -1,6 +1,6 @@
 # Vaneesa - Implementation Plan
 
-This document outlines the phased approach to building Vaneesa from the ground up, moving from the empty repository to a fully functional Wails v3 network monitor. 
+This document outlines the phased approach to building Vaneesa from the ground up, moving from the empty repository to a fully functional Wails v3 network monitor.
 
 **Note on Styling:** All UI components will use **Vanilla CSS** for strict control, high performance, and to prevent utility-class clutter, as well as providing premium dark-themed aesthetics.
 
@@ -9,15 +9,19 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 1: Project Initialisation & Skeleton
 *Goal: Have a running Wails v3 application with a React + TypeScript frontend talking to an empty Go backend.*
 
+**Status: ✅ Complete**
+
 1. **Initialise Wails:** Use `wails3 init` to establish the React + TypeScript template.
 2. **Directory Structure:** Organise the `frontend/src` into `components/`, `views/`, `store/`, and `styles/`.
 3. **Vanilla CSS Setup:** Establish global CSS variables (`index.css`) defining the dark-first colour palette (backgrounds, primary/secondary text, alert severities, table borders, typefaces).
-4. **Service Stubs (Go):** Create the boilerplate structs for `CaptureService`, `FlowService`, `AlertService`, etc., and register them with the Wails application instance. 
+4. **Service Stubs (Go):** Create the boilerplate structs for `CaptureService`, `FlowService`, `AlertService`, etc., and register them with the Wails application instance.
 
 ---
 
 ## Phase 2: Core UI Shell & Navigation State
 *Goal: The user can navigate between completely empty shell views.*
+
+**Status: 🟡 In Progress (Menus Complete)**
 
 1. **Zustand Store (Navigation):** Setup global state to track the active view.
 2. **Main Layout Layout:** Build the overarching flex/grid structure containing:
@@ -26,7 +30,13 @@ This document outlines the phased approach to building Vaneesa from the ground u
     - Status/Toolbar (for current capture state, session name)
     - Active Viewport
 3. **Empty Views:** Create the empty placeholder React components for Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, and Settings.
-4. **Native Menus (Go):** Define the basic Wails OS Application Menus (File, Edit, View, Help).
+4. **Native Menus (Go):** ✅ Define the basic Wails OS Application Menus (File, Edit, View, Help).
+    - File: New Session, Open PCAP, Export (CSV/JSON), Settings, Quit
+    - Edit: Standard undo/redo/cut/copy/paste (via Wails role)
+    - View: Navigate to all views (Ctrl+1-6), Zoom controls, Fullscreen toggle
+    - Window: Standard window management (via Wails role)
+    - Help: Documentation, Check for Updates, About
+    - All menu items emit Wails events for frontend to handle
 
 ---
 
