@@ -6,11 +6,11 @@ This document maps out the specific user flows, window structures, menus, and co
 
 ## 1. Application Structure and Window
 
-Vaneesa runs as a single-window desktop application. The window will be heavily driven by the Wails v3 dark-first interface, using CSS/React for most visual elements, whilst delegating system-level menus to native Wails v3 implementations.
+Vaneesa runs as a single-window desktop application **using a standard Native OS Window** (not frameless). The content will be heavily driven by the Wails v3 dark-first interface, using CSS/React for most visual elements, whilst delegating system-level menus to native Wails v3 implementations.
 
 **Primary Layout (React/Zustand):**
 - **Sidebar / Activity Bar:** For navigating between major views (Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, Settings).
-- **Status/Title Bar:** Indicates current capture state (Live, PCAP Replay, Offline), current session name, and active interface.
+- **Status Bar:** Indicates current capture state (Live, PCAP Replay, Offline), current session name, and active interface.
 - **Main Viewport:** Renders the currently selected view.
 
 ---
