@@ -13,15 +13,16 @@ This document outlines the phased approach to building Vaneesa from the ground u
 
 1. **Initialise Wails:** Use `wails3 init` to establish the React + TypeScript template.
 2. **Directory Structure:** Organise the `frontend/src` into `components/`, `views/`, `store/`, and `styles/`.
-3. **Fluent UI Setup:** Configure the `FluentProvider` with a dark theme and establish global design tokens for the application.
-4. **Service Stubs (Go):** Create the boilerplate structs for `CaptureService`, `FlowService`, `AlertService`, etc., and register them with the Wails application instance.
+3. **Fluent UI Setup:** Configure the `FluentProvider` with dark/light theme support and establish global design tokens for the application.
+4. **Theme Service (Go):** ✅ Implement system theme change detection using Wails v3's `Env.IsDarkMode()` and `ThemeChanged` events. Frontend automatically adapts between light and dark themes.
+5. **Service Stubs (Go):** Create the boilerplate structs for `CaptureService`, `FlowService`, `AlertService`, etc., and register them with the Wails application instance.
 
 ---
 
 ## Phase 2: Core UI Shell & Navigation State
 *Goal: The user can navigate between completely empty shell views.*
 
-**Status: 🟡 In Progress (Menus Complete, UI Shell Pending)**
+**Status: 🟡 In Progress (Menus Complete, Theme Complete, Layout Pending)**
 
 1. **Zustand Store (Navigation):** Setup global state to track the active view.
 2. **Main Layout Layout:** Build the overarching flex/grid structure containing:
@@ -37,6 +38,7 @@ This document outlines the phased approach to building Vaneesa from the ground u
     - **Window:** Standard window management (via Wails role)
     - **Help:** Documentation/GitHub, Check for Updates, About Vaneesa (native dialog with app icon)
     - All menu items emit Wails events for frontend to handle; About uses native Dialog.Info() API
+5. **Viewport CSS:** ✅ HTML/CSS reset applied to prevent scrollbars and ensure full viewport coverage without margins.
 
 ---
 
