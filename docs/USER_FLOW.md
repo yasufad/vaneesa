@@ -9,9 +9,9 @@ This document maps out the specific user flows, window structures, menus, and co
 Vaneesa runs as a single-window desktop application **using a standard Native OS Window** (not frameless). The content will be heavily driven by the Wails v3 dark-first interface, using CSS/React for most visual elements, whilst delegating system-level menus to native Wails v3 implementations.
 
 **Primary Layout (React/Zustand):**
-- **Sidebar / Activity Bar:** For navigating between major views (Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, Settings).
+- **Resizable Left Panel (Sidebar):** Contains vertical tabs for navigating between major views (Dashboard, Connections, Hosts, Protocols, Alerts, Sessions, Settings). The user can horizontally resize this panel to save space.
 - **Status Bar:** Indicates current capture state (Live, PCAP Replay, Offline), current session name, and active interface.
-- **Main Viewport:** Renders the currently selected view.
+- **Main Viewport:** Renders the currently selected view, taking up the remaining right side of the window.
 
 ---
 
