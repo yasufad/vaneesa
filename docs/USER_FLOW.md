@@ -112,7 +112,6 @@ Context menus will be built using Wails v3 Native Context Menus, triggered via a
 ---
 
 ## 5. Next Steps for Implementation
-1. **Initialise standard Wails v3 frontend boilerplate** (React + TypeScript + Vite + Tailwind/Zustand if preferred).
+1. **Initialise standard Wails v3 frontend boilerplate** (React + TypeScript + Vite + Fluent UI v9 React).
 2. **Setup the pure UI shell**: Activity Bar, Title Bar layout without actual data.
 3. **Register native Wails Application Menus** within `main.go`.
-4. **Implement Zustand Mock Stores** so the frontend can be developed without a live packet capture dependency.
