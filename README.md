@@ -52,14 +52,6 @@ Session data is stored locally in SQLite. Nothing leaves your machine.
 
 ---
 
-## Project status
-
-Early development. The capture pipeline and connection tracking are working. The dashboard and host views are in progress. Anomaly detection is partially implemented. The PCAP import/export story is planned but not yet built.
-
-If something is broken, open an issue with your OS, the interface type you were capturing on, and what happened. Vague bug reports are hard to act on.
-
----
-
 ## Contributing
 
 Read `CONTRIBUTING.md` before opening a pull request. The short version: discuss significant changes in an issue first, keep pull requests focused on one thing, and test on at least two platforms if you are touching the capture or storage layer.
