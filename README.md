@@ -52,6 +52,12 @@ Session data is stored locally in SQLite. Nothing leaves your machine.
 
 ---
 
+## Project status
+
+Planning phase. The product definition, architecture, and user flows are fully documented. The codebase has not yet been implemented. We are currently preparing to initialise the project and begin the first development phase.
+
+---
+
 ## Contributing
 
 Read `CONTRIBUTING.md` before opening a pull request. The short version: discuss significant changes in an issue first, keep pull requests focused on one thing, and test on at least two platforms if you are touching the capture or storage layer.
