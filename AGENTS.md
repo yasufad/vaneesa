@@ -36,4 +36,4 @@ Do not assume your generated code compiles. You must verify it iteratively.
 As an agent, you must fundamentally obey all constraints laid out in `CONTRIBUTING.md`. Specifically:
 *   **Single-file per commit:** Grouping multiple files into one commit is forbidden.
 *   **Conventional Commits:** Keep commit messages rigidly formatted (`feat:`, `fix:`, etc.).
-*   **International English:** Strictly use UK spelling patterns (`behaviour`, `colour`, `analyse`) throughout all code and text.
+*   **International English:** Strictly use UK spelling patterns (`behaviour`, `colour`, `analyse`) throughout all code and text, unless an external library or API specifically dictates otherwise.
