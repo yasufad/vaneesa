@@ -17,6 +17,8 @@ import {
   Settings24Regular,
 } from "@fluentui/react-icons";
 import { useNavigationStore, ViewType } from "../store/navigation";
+import { useCaptureStore } from "../store/capture";
+import { CaptureState } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 
 const useStyles = makeStyles({
   root: {
@@ -81,6 +83,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarWidth, setSidebarWidth] = useState(240);
   const activeView = useNavigationStore((state) => state.activeView);
   const setActiveView = useNavigationStore((state) => state.setActiveView);
+  const status = useCaptureStore((state) => state.status);
 
   const handleTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     setActiveView(data.value as ViewType);
@@ -153,7 +156,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* Bottom Status Bar */}
-      <footer className={styles.statusBar}>Offline | No Session Active</footer>
+      <footer className={styles.statusBar}>
+        {status.State === CaptureState.StateRunning
+          ? `Capturing: ${status.SessionName} on ${status.Interface}${status.OverflowDrops > 0 ? ` | ${status.OverflowDrops} drops` : ""}`
+          : status.State === CaptureState.StateError
+            ? `Error: ${status.ErrorMessage}`
+            : "Offline | No Session Active"}
+      </footer>
     </div>
   );
 };
