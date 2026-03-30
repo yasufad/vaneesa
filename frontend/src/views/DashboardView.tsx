@@ -182,7 +182,8 @@ export const DashboardView = () => {
 
   const bytesIn = currentSnapshot?.BytesIn ?? 0;
   const bytesOut = currentSnapshot?.BytesOut ?? 0;
-  const activeFlows = currentSnapshot?.FlowDeltas.filter((f) => !f.Closed).length ?? 0;
+  const activeFlows =
+    currentSnapshot?.FlowDeltas.filter((f) => !f.Closed).length ?? 0;
   const uniqueHosts = currentSnapshot
     ? new Set([
         ...currentSnapshot.FlowDeltas.map((f) => f.Key.SrcIP.join(".")),
@@ -217,10 +218,12 @@ export const DashboardView = () => {
             <span>Bytes In / s</span>
           </div>
           <div className={styles.metricValue}>
-            {hasData ? formatBytes(bytesIn) : "—"}
+            {hasData ? formatBytes(bytesIn) : "-"}
           </div>
           <div className={styles.metricNote}>
-            {hasData ? `${formatNumber(currentSnapshot.PacketsIn)} packets` : "No active capture"}
+            {hasData
+              ? `${formatNumber(currentSnapshot.PacketsIn)} packets`
+              : "No active capture"}
           </div>
         </Card>
 
@@ -230,10 +233,12 @@ export const DashboardView = () => {
             <span>Bytes Out / s</span>
           </div>
           <div className={styles.metricValue}>
-            {hasData ? formatBytes(bytesOut) : "—"}
+            {hasData ? formatBytes(bytesOut) : "-"}
           </div>
           <div className={styles.metricNote}>
-            {hasData ? `${formatNumber(currentSnapshot.PacketsOut)} packets` : "No active capture"}
+            {hasData
+              ? `${formatNumber(currentSnapshot.PacketsOut)} packets`
+              : "No active capture"}
           </div>
         </Card>
 
@@ -243,7 +248,7 @@ export const DashboardView = () => {
             <span>Active Connections</span>
           </div>
           <div className={styles.metricValue}>
-            {hasData ? formatNumber(activeFlows) : "—"}
+            {hasData ? formatNumber(activeFlows) : "-"}
           </div>
           <div className={styles.metricNote}>
             {hasData ? "flows" : "No active capture"}
@@ -256,7 +261,7 @@ export const DashboardView = () => {
             <span>Discovered Hosts</span>
           </div>
           <div className={styles.metricValue}>
-            {hasData ? formatNumber(uniqueHosts) : "—"}
+            {hasData ? formatNumber(uniqueHosts) : "-"}
           </div>
           <div className={styles.metricNote}>
             {hasData ? "unique IPs" : "No active capture"}
@@ -266,7 +271,7 @@ export const DashboardView = () => {
 
       <div className={styles.chartsRow}>
         <Card className={styles.chartCard}>
-          <span className={styles.chartTitle}>Bandwidth — Last 2 Minutes</span>
+          <span className={styles.chartTitle}>Bandwidth - Last 2 Minutes</span>
           <BandwidthChart />
         </Card>
         <Card className={styles.chartCard}>
