@@ -3,9 +3,12 @@ import {
   tokens,
   Title2,
   Card,
-  Button,
 } from "@fluentui/react-components";
 import { ProtocolHandler24Regular } from "@fluentui/react-icons";
+import { useCaptureStore } from "../store/capture";
+import { useTrafficStore } from "../store/traffic";
+import { Protocol } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
+import { ProtocolChart } from "../components/ProtocolChart";
 
 const useStyles = makeStyles({
   root: {
@@ -140,28 +143,42 @@ const useStyles = makeStyles({
   },
 });
 
-const PROTOCOLS = [
-  { name: "TCP",  colour: tokens.colorPaletteGreenBackground2,  barPct: "68%",  displayPct: "—" },
-  { name: "UDP",  colour: tokens.colorPaletteBlueForeground2,   barPct: "21%",  displayPct: "—" },
-  { name: "DNS",  colour: tokens.colorPalettePurpleBackground2, barPct: "7%",   displayPct: "—" },
-  { name: "ARP",  colour: tokens.colorPaletteYellowBackground2, barPct: "2%",   displayPct: "—" },
-  { name: "ICMP", colour: tokens.colorPaletteRedBackground2,    barPct: "1%",   displayPct: "—" },
-  { name: "Other",colour: tokens.colorNeutralBackground5,       barPct: "1%",   displayPct: "—" },
-];
-
-const DETAIL_ROWS = [
-  ["72%", "65%", "80%"],
-  ["58%", "70%", "60%"],
-  ["88%", "55%", "75%"],
-  ["64%", "80%", "65%"],
-  ["78%", "60%", "70%"],
-  ["50%", "72%", "55%"],
-];
-
-const TIME_RANGES = ["1 min", "2 min", "5 min", "10 min"] as const;
-
 export const ProtocolsView = () => {
   const styles = useStyles();
+  const { status } = useCaptureStore();
+  const { currentSnapshot } = useTrafficStore();
+
+  const getProtocolName = (proto: Protocol): string => {
+    switch (proto) {
+      case Protocol.ProtoTCP: return "TCP";
+      case Protocol.ProtoUDP: return "UDP";
+      case Protocol.ProtoICMP: return "ICMP";
+      case Protocol.ProtoICMPv6: return "ICMPv6";
+      case Protocol.ProtoARP: return "ARP";
+      default: return "Other";
+    }
+  };
+
+  const getProtocolColour = (proto: Protocol): string => {
+    switch (proto) {
+      case Protocol.ProtoTCP: return tokens.colorPaletteGreenBackground2;
+      case Protocol.ProtoUDP: return tokens.colorPaletteBlueForeground2;
+      case Protocol.ProtoICMP: return tokens.colorPaletteYellowBackground2;
+      case Protocol.ProtoICMPv6: return tokens.colorPalettePurpleBackground2;
+      case Protocol.ProtoARP: return tokens.colorPaletteRedBackground2;
+      default: return tokens.colorNeutralBackground5;
+    }
+  };
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  };
+
+  const totalBytes = currentSnapshot?.ProtocolStats?.reduce((sum, stat) => sum + stat.Bytes, 0) || 0;
+  const hasActiveCapture = status.SessionID !== 0;
 
   return (
     <div className={styles.root}>
@@ -169,73 +186,98 @@ export const ProtocolsView = () => {
         <div>
           <Title2>Protocols</Title2>
           <div className={styles.subtitle}>
-            Network activity distribution over time — start a capture session to populate this view.
+            {hasActiveCapture
+              ? "Network activity distribution over time"
+              : "Network activity distribution over time — start a capture session to populate this view."}
           </div>
-        </div>
-        <div className={styles.timeRangeGroup}>
-          {TIME_RANGES.map((range, i) => (
-            <Button
-              key={range}
-              size="small"
-              appearance={i === 1 ? "primary" : "subtle"}
-              disabled
-            >
-              {range}
-            </Button>
-          ))}
         </div>
       </div>
 
       <Card className={styles.chartCard}>
-        <span className={styles.chartTitle}>Protocol Distribution — Last 2 Minutes</span>
-        <div className={styles.chartArea}>
-          <ProtocolHandler24Regular style={{ fontSize: "28px", opacity: 0.3 }} />
-          <span>
-            Stacked time-series chart will render here.<br />
-            <span style={{ opacity: 0.7 }}>Protocol byte-counts at 1-second resolution.</span>
-          </span>
-        </div>
+        <span className={styles.chartTitle}>Protocol Distribution</span>
+        {hasActiveCapture && currentSnapshot ? (
+          <div style={{ height: "280px" }}>
+            <ProtocolChart />
+          </div>
+        ) : (
+          <div className={styles.chartArea}>
+            <ProtocolHandler24Regular style={{ fontSize: "28px", opacity: 0.3 }} />
+            <span>
+              Protocol distribution chart will render here.<br />
+              <span style={{ opacity: 0.7 }}>Start a capture to see live protocol breakdown.</span>
+            </span>
+          </div>
+        )}
       </Card>
 
       <Card className={styles.breakdownCard}>
         <span className={styles.breakdownTitle}>Protocol Breakdown</span>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL, flexShrink: 0 }}>
-          {PROTOCOLS.map(({ name, colour, barPct, displayPct }) => (
-            <div key={name} className={styles.protocolRow}>
-              <span className={styles.protocolName}>{name}</span>
-              <div className={styles.barTrack}>
-                <div
-                  className={styles.barFill}
-                  style={{ width: barPct, backgroundColor: colour }}
-                />
-              </div>
-              <span className={styles.protocolPct}>{displayPct}</span>
+        {!hasActiveCapture && (
+          <div style={{ padding: tokens.spacingVerticalXL, textAlign: "center", color: tokens.colorNeutralForeground3 }}>
+            Start a capture to see protocol statistics
+          </div>
+        )}
+
+        {hasActiveCapture && currentSnapshot && (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL, flexShrink: 0 }}>
+              {currentSnapshot.ProtocolStats.map((stat) => {
+                const pct = totalBytes > 0 ? ((stat.Bytes / totalBytes) * 100).toFixed(1) : "0.0";
+                return (
+                  <div key={stat.Protocol} className={styles.protocolRow}>
+                    <span className={styles.protocolName}>{getProtocolName(stat.Protocol)}</span>
+                    <div className={styles.barTrack}>
+                      <div
+                        className={styles.barFill}
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: getProtocolColour(stat.Protocol),
+                        }}
+                      />
+                    </div>
+                    <span className={styles.protocolPct}>{pct}%</span>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
 
-        <div style={{ height: "1px", backgroundColor: tokens.colorNeutralStroke2, marginTop: tokens.spacingVerticalS }} />
+            <div style={{ height: "1px", backgroundColor: tokens.colorNeutralStroke2, marginTop: tokens.spacingVerticalS }} />
 
-        <div className={styles.colHeaders}>
-          <span>Protocol</span>
-          <span>Proportion</span>
-          <span>%</span>
-          <span>Bytes</span>
-          <span>Packets</span>
-        </div>
-
-        <div className={styles.breakdownList}>
-          {DETAIL_ROWS.map((widths, i) => (
-            <div key={i} className={styles.detailRow}>
-              <div className={styles.skeletonBar} style={{ width: "70%" }} />
-              <div className={styles.skeletonBar} style={{ width: "100%" }} />
-              <div className={styles.skeletonBar} style={{ width: widths[0] }} />
-              <div className={styles.skeletonBar} style={{ width: widths[1] }} />
-              <div className={styles.skeletonBar} style={{ width: widths[2] }} />
+            <div className={styles.colHeaders}>
+              <span>Protocol</span>
+              <span>Proportion</span>
+              <span>%</span>
+              <span>Bytes</span>
+              <span>Packets</span>
             </div>
-          ))}
-        </div>
+
+            <div className={styles.breakdownList}>
+              {currentSnapshot.ProtocolStats.map((stat) => {
+                const pct = totalBytes > 0 ? ((stat.Bytes / totalBytes) * 100).toFixed(1) : "0.0";
+                return (
+                  <div key={stat.Protocol} className={styles.detailRow}>
+                    <span style={{ fontSize: tokens.fontSizeBase200, fontWeight: tokens.fontWeightSemibold }}>
+                      {getProtocolName(stat.Protocol)}
+                    </span>
+                    <div className={styles.barTrack}>
+                      <div
+                        className={styles.barFill}
+                        style={{
+                          width: `${pct}%`,
+                          backgroundColor: getProtocolColour(stat.Protocol),
+                        }}
+                      />
+                    </div>
+                    <span className={styles.protocolPct}>{pct}%</span>
+                    <span style={{ fontSize: tokens.fontSizeBase200 }}>{formatBytes(stat.Bytes)}</span>
+                    <span style={{ fontSize: tokens.fontSizeBase200 }}>{stat.Packets.toLocaleString()}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </Card>
     </div>
   );
