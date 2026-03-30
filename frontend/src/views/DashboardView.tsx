@@ -7,6 +7,8 @@ import {
 } from "@fluentui/react-icons";
 import { CaptureControl } from "../components/CaptureControl";
 import { useTrafficStore } from "../store/traffic";
+import { BandwidthChart } from "../components/BandwidthChart";
+import { ProtocolChart } from "../components/ProtocolChart";
 
 const useStyles = makeStyles({
   root: {
@@ -265,21 +267,11 @@ export const DashboardView = () => {
       <div className={styles.chartsRow}>
         <Card className={styles.chartCard}>
           <span className={styles.chartTitle}>Bandwidth — Last 2 Minutes</span>
-          <div className={styles.chartArea}>
-            Time-series bandwidth graph will render here.
-            <br />
-            <span style={{ opacity: 0.7 }}>
-              Bytes/s inbound vs. outbound at 1-second resolution.
-            </span>
-          </div>
+          <BandwidthChart />
         </Card>
         <Card className={styles.chartCard}>
           <span className={styles.chartTitle}>Protocol Distribution</span>
-          <div className={styles.chartArea}>
-            Pie chart will render here.
-            <br />
-            <span style={{ opacity: 0.7 }}>TCP · UDP · ICMP · DNS · ARP</span>
-          </div>
+          <ProtocolChart />
         </Card>
       </div>
 
