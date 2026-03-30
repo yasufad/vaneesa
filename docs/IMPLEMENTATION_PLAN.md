@@ -74,15 +74,15 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 5: Frontend UI Implementation
 *Goal: Build the actual UI components for capture control and data visualisation.*
 
-**Status: 🔄 In Progress**
+**Status: ✅ Complete**
 
 1. **Capture Control UI:** ✅ Implemented start/stop capture controls with interface selection, BPF filter input, and promiscuous mode toggle.
 2. **Dashboard View:** ✅ Built real-time traffic visualisation with bandwidth/protocol charts and live metrics display.
 3. **Connections View:** ✅ Implemented flow table with live data loading, IP/port search filtering, and protocol filtering.
 4. **Hosts View:** ✅ Built host discovery table with selectable detail panel showing MAC, vendor, traffic stats, and timestamps.
 5. **Protocols View:** ✅ Implemented protocol breakdown with live percentage bars, detailed statistics table, and protocol distribution chart.
-6. **Alerts View:** Build alert list with severity filtering and acknowledgement.
-7. **Sessions View:** Implement session history with replay capability.
+6. **Alerts View:** ✅ Built alert list with severity filtering (Critical/Warning/Info) and acknowledgement functionality.
+7. **Sessions View:** ✅ Implemented session history with live loading and CSV/JSON export functionality.
 
 ---
 
