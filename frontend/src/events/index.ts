@@ -24,7 +24,8 @@ export function initialiseEventListeners() {
   });
 
   // Menu navigation events
-  Events.On("menu:navigate", (view: string) => {
+  Events.On("menu:navigate", (ev) => {
+    const view = ev.data;
     const validViews = [
       "dashboard",
       "connections",
@@ -34,13 +35,14 @@ export function initialiseEventListeners() {
       "sessions",
       "settings",
     ];
-    if (validViews.includes(view)) {
+    if (typeof view === "string" && validViews.includes(view)) {
       useNavigationStore.getState().setActiveView(view as any);
     }
   });
 
   // Theme change events
-  Events.On("theme:changed", (theme: string) => {
+  Events.On("theme:changed", (ev) => {
+    const theme = ev.data;
     console.log("Theme changed:", theme);
     // TODO: Wire to theme store when implemented
   });
