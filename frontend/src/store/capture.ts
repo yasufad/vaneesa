@@ -2,6 +2,7 @@ import { create } from "zustand";
 import {
   CaptureStatus,
   CaptureState,
+  CaptureMode,
   InterfaceInfo,
 } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 import * as CaptureService from "../../bindings/github.com/yasufad/vaneesa/captureservice";
@@ -25,7 +26,7 @@ interface CaptureStore {
 
 const DEFAULT_STATUS: CaptureStatus = new CaptureStatus({
   State: CaptureState.StateIdle,
-  Mode: "live",
+  Mode: CaptureMode.CaptureLive,
   Interface: "",
   SessionID: 0,
   SessionName: "",
