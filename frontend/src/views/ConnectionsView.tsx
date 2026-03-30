@@ -9,13 +9,13 @@ import {
   Option,
   Badge,
 } from "@fluentui/react-components";
-import {
-  Search24Regular,
-  PlugConnected24Regular,
-} from "@fluentui/react-icons";
+import { Search24Regular, PlugConnected24Regular } from "@fluentui/react-icons";
 import { useCaptureStore } from "../store/capture";
 import * as FlowService from "../../bindings/github.com/yasufad/vaneesa/flowservice";
-import { FlowRecord, Protocol } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
+import {
+  FlowRecord,
+  Protocol,
+} from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 
 const useStyles = makeStyles({
   root: {
@@ -124,7 +124,11 @@ export const ConnectionsView = () => {
     const loadFlows = async () => {
       setLoading(true);
       try {
-        const result = await FlowService.GetPagedFlows(status.SessionID, 0, 100);
+        const result = await FlowService.GetPagedFlows(
+          status.SessionID,
+          0,
+          100,
+        );
         setFlows(result?.Flows || []);
       } catch (err) {
         console.error("Failed to load flows:", err);
@@ -156,36 +160,51 @@ export const ConnectionsView = () => {
 
   const getProtocolName = (proto: Protocol): string => {
     switch (proto) {
-      case Protocol.ProtoTCP: return "TCP";
-      case Protocol.ProtoUDP: return "UDP";
-      case Protocol.ProtoICMP: return "ICMP";
-      case Protocol.ProtoICMPv6: return "ICMPv6";
-      case Protocol.ProtoARP: return "ARP";
-      default: return "Other";
+      case Protocol.ProtoTCP:
+        return "TCP";
+      case Protocol.ProtoUDP:
+        return "UDP";
+      case Protocol.ProtoICMP:
+        return "ICMP";
+      case Protocol.ProtoICMPv6:
+        return "ICMPv6";
+      case Protocol.ProtoARP:
+        return "ARP";
+      default:
+        return "Other";
     }
   };
 
   const getProtocolColour = (proto: Protocol): string => {
     switch (proto) {
-      case Protocol.ProtoTCP: return tokens.colorPaletteGreenForeground1;
-      case Protocol.ProtoUDP: return tokens.colorPaletteBlueForeground2;
-      case Protocol.ProtoICMP: return tokens.colorPaletteYellowForeground1;
-      case Protocol.ProtoICMPv6: return tokens.colorPalettePurpleForeground2;
-      default: return tokens.colorNeutralForeground3;
+      case Protocol.ProtoTCP:
+        return tokens.colorPaletteGreenForeground1;
+      case Protocol.ProtoUDP:
+        return tokens.colorPaletteBlueForeground2;
+      case Protocol.ProtoICMP:
+        return tokens.colorPaletteYellowForeground1;
+      case Protocol.ProtoICMPv6:
+        return tokens.colorPalettePurpleForeground2;
+      default:
+        return tokens.colorNeutralForeground3;
     }
   };
 
   const filteredFlows = flows.filter((flow) => {
-    const matchesSearch = searchFilter === "" ||
+    const matchesSearch =
+      searchFilter === "" ||
       flow.SrcIP?.includes(searchFilter) ||
       flow.DstIP?.includes(searchFilter) ||
       flow.SrcPort?.toString().includes(searchFilter) ||
       flow.DstPort?.toString().includes(searchFilter);
 
-    const matchesProtocol = protocolFilter === "all" ||
+    const matchesProtocol =
+      protocolFilter === "all" ||
       (protocolFilter === "tcp" && flow.Protocol === Protocol.ProtoTCP) ||
       (protocolFilter === "udp" && flow.Protocol === Protocol.ProtoUDP) ||
-      (protocolFilter === "icmp" && (flow.Protocol === Protocol.ProtoICMP || flow.Protocol === Protocol.ProtoICMPv6));
+      (protocolFilter === "icmp" &&
+        (flow.Protocol === Protocol.ProtoICMP ||
+          flow.Protocol === Protocol.ProtoICMPv6));
 
     return matchesSearch && matchesProtocol;
   });
@@ -211,7 +230,7 @@ export const ConnectionsView = () => {
         >
           {hasActiveCapture
             ? `${filteredFlows.length} active flows`
-            : "No active capture — flows will appear here once monitoring begins."}
+            : "No active capture - flows will appear here once monitoring begins."}
         </span>
       </div>
 
@@ -228,13 +247,27 @@ export const ConnectionsView = () => {
           placeholder="Protocol"
           size="small"
           style={{ minWidth: "110px" }}
-          value={protocolFilter === "all" ? "All protocols" : protocolFilter.toUpperCase()}
-          onOptionSelect={(_, data) => setProtocolFilter(data.optionValue as string)}
+          value={
+            protocolFilter === "all"
+              ? "All protocols"
+              : protocolFilter.toUpperCase()
+          }
+          onOptionSelect={(_, data) =>
+            setProtocolFilter(data.optionValue as string)
+          }
         >
-          <Option value="all" text="All protocols">All protocols</Option>
-          <Option value="tcp" text="TCP">TCP</Option>
-          <Option value="udp" text="UDP">UDP</Option>
-          <Option value="icmp" text="ICMP">ICMP</Option>
+          <Option value="all" text="All protocols">
+            All protocols
+          </Option>
+          <Option value="tcp" text="TCP">
+            TCP
+          </Option>
+          <Option value="udp" text="UDP">
+            UDP
+          </Option>
+          <Option value="icmp" text="ICMP">
+            ICMP
+          </Option>
         </Dropdown>
       </div>
 
@@ -271,10 +304,10 @@ export const ConnectionsView = () => {
 
           {filteredFlows.map((flow) => (
             <div key={flow.ID} className={styles.tableRow}>
-              <span>{flow.SrcIP || "—"}</span>
-              <span>{flow.DstIP || "—"}</span>
-              <span>{flow.SrcPort || "—"}</span>
-              <span>{flow.DstPort || "—"}</span>
+              <span>{flow.SrcIP || "-"}</span>
+              <span>{flow.DstIP || "-"}</span>
+              <span>{flow.SrcPort || "-"}</span>
+              <span>{flow.DstPort || "-"}</span>
               <div>
                 <Badge
                   appearance="tint"
