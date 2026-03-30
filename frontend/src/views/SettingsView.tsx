@@ -190,9 +190,9 @@ export const SettingsView = () => {
                 id="setting-interface"
                 placeholder="Select an interface"
                 style={{ flex: 1 }}
-                value={settings.defaultInterface || undefined}
+                value={settings.DefaultInterface || undefined}
                 onOptionSelect={(_, data) =>
-                  updateSettings({ defaultInterface: data.optionValue ?? "" })
+                  updateSettings({ DefaultInterface: data.optionValue ?? "" })
                 }
               >
                 {INTERFACE_PLACEHOLDERS.map((iface) => (
@@ -214,13 +214,13 @@ export const SettingsView = () => {
             </div>
             <div className={styles.settingControl}>
               <Switch
-                checked={settings.promiscuousMode}
+                checked={settings.Promiscuous}
                 onChange={(_, data) =>
-                  updateSettings({ promiscuousMode: data.checked })
+                  updateSettings({ Promiscuous: data.checked })
                 }
                 label={
                   <span>
-                    {settings.promiscuousMode ? "Enabled" : "Disabled"}
+                    {settings.Promiscuous ? "Enabled" : "Disabled"}
                   </span>
                 }
               />
@@ -243,9 +243,9 @@ export const SettingsView = () => {
                 id="setting-bpf"
                 placeholder="e.g. not port 22 and not arp"
                 style={{ flex: 1 }}
-                value={settings.bpfFilter}
+                value={settings.DefaultFilter}
                 onChange={(_, data) =>
-                  updateSettings({ bpfFilter: data.value })
+                  updateSettings({ DefaultFilter: data.value })
                 }
               />
             </div>
@@ -263,7 +263,7 @@ export const SettingsView = () => {
               <p className={styles.description}>
                 Alert when a source IP's packet rate exceeds this multiple of
                 its 60-second rolling average. Lower values are more sensitive.
-                Requires a baseline of at least {thresholds.rateSpikeMinimumPPS}{" "}
+                Requires a baseline of at least {thresholds.RateSpikeMinBaseline}{" "}
                 pps to activate.
               </p>
             </div>
@@ -273,13 +273,13 @@ export const SettingsView = () => {
                 min={2}
                 max={20}
                 step={1}
-                value={thresholds.rateSpikeMultiplier}
+                value={thresholds.RateSpikeMultiplier}
                 onChange={(_, data) =>
-                  updateThresholds({ rateSpikeMultiplier: data.value })
+                  updateThresholds({ RateSpikeMultiplier: data.value })
                 }
               />
               <span className={styles.sliderValue}>
-                {thresholds.rateSpikeMultiplier}×
+                {thresholds.RateSpikeMultiplier}×
               </span>
             </div>
           </Card>
@@ -299,13 +299,13 @@ export const SettingsView = () => {
                 min={1}
                 max={100}
                 step={1}
-                value={thresholds.rateSpikeMinimumPPS}
+                value={thresholds.RateSpikeMinBaseline}
                 onChange={(_, data) =>
-                  updateThresholds({ rateSpikeMinimumPPS: data.value })
+                  updateThresholds({ RateSpikeMinBaseline: data.value })
                 }
               />
               <span className={styles.sliderValue}>
-                {thresholds.rateSpikeMinimumPPS} pps
+                {thresholds.RateSpikeMinBaseline} pps
               </span>
             </div>
           </Card>
@@ -326,13 +326,13 @@ export const SettingsView = () => {
                 min={5}
                 max={100}
                 step={1}
-                value={thresholds.portScanThreshold}
+                value={thresholds.PortScanDistinctPorts}
                 onChange={(_, data) =>
-                  updateThresholds({ portScanThreshold: data.value })
+                  updateThresholds({ PortScanDistinctPorts: data.value })
                 }
               />
               <span className={styles.sliderValue}>
-                {thresholds.portScanThreshold} ports
+                {thresholds.PortScanDistinctPorts} ports
               </span>
             </div>
           </Card>
@@ -352,13 +352,13 @@ export const SettingsView = () => {
                 min={2}
                 max={50}
                 step={1}
-                value={thresholds.synFloodRatio}
+                value={thresholds.SYNFloodRatio}
                 onChange={(_, data) =>
-                  updateThresholds({ synFloodRatio: data.value })
+                  updateThresholds({ SYNFloodRatio: data.value })
                 }
               />
               <span className={styles.sliderValue}>
-                {thresholds.synFloodRatio}:1
+                {thresholds.SYNFloodRatio}:1
               </span>
             </div>
           </Card>
@@ -378,13 +378,13 @@ export const SettingsView = () => {
                 min={10}
                 max={500}
                 step={10}
-                value={thresholds.synFloodMinimumSYNs}
+                value={thresholds.SYNFloodMinSYNs}
                 onChange={(_, data) =>
-                  updateThresholds({ synFloodMinimumSYNs: data.value })
+                  updateThresholds({ SYNFloodMinSYNs: data.value })
                 }
               />
               <span className={styles.sliderValue}>
-                {thresholds.synFloodMinimumSYNs} SYNs
+                {thresholds.SYNFloodMinSYNs} SYNs
               </span>
             </div>
           </Card>
