@@ -156,15 +156,17 @@ export const HostsView = () => {
   const formatBytes = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    if (bytes < 1024 * 1024 * 1024)
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   };
 
-  const filteredHosts = hosts.filter((host) =>
-    searchFilter === "" ||
-    host.IP?.toLowerCase().includes(searchFilter.toLowerCase()) ||
-    host.MAC?.toLowerCase().includes(searchFilter.toLowerCase()) ||
-    host.Vendor?.toLowerCase().includes(searchFilter.toLowerCase())
+  const filteredHosts = hosts.filter(
+    (host) =>
+      searchFilter === "" ||
+      host.IP?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      host.MAC?.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      host.Vendor?.toLowerCase().includes(searchFilter.toLowerCase()),
   );
 
   const hasActiveCapture = status.SessionID !== 0;
@@ -174,7 +176,8 @@ export const HostsView = () => {
       <div className={styles.header}>
         <Title2>Hosts</Title2>
         <div className={styles.subtitle}>
-          Devices discovered passively from network traffic — click a host to view its profile.
+          Devices discovered passively from network traffic - click a host to
+          view its profile.
         </div>
       </div>
 
@@ -190,12 +193,24 @@ export const HostsView = () => {
           />
           <div className={styles.hostList}>
             {!hasActiveCapture && (
-              <div style={{ padding: tokens.spacingVerticalL, textAlign: "center", color: tokens.colorNeutralForeground3 }}>
+              <div
+                style={{
+                  padding: tokens.spacingVerticalL,
+                  textAlign: "center",
+                  color: tokens.colorNeutralForeground3,
+                }}
+              >
                 Start a capture to discover hosts
               </div>
             )}
             {hasActiveCapture && filteredHosts.length === 0 && (
-              <div style={{ padding: tokens.spacingVerticalL, textAlign: "center", color: tokens.colorNeutralForeground3 }}>
+              <div
+                style={{
+                  padding: tokens.spacingVerticalL,
+                  textAlign: "center",
+                  color: tokens.colorNeutralForeground3,
+                }}
+              >
                 No hosts discovered yet
               </div>
             )}
@@ -205,7 +220,10 @@ export const HostsView = () => {
                 className={styles.hostItem}
                 onClick={() => setSelectedHost(host)}
                 style={{
-                  backgroundColor: selectedHost?.ID === host.ID ? tokens.colorNeutralBackground2 : undefined,
+                  backgroundColor:
+                    selectedHost?.ID === host.ID
+                      ? tokens.colorNeutralBackground2
+                      : undefined,
                   cursor: "pointer",
                 }}
               >
@@ -213,17 +231,32 @@ export const HostsView = () => {
                   <Desktop24Regular style={{ fontSize: "16px" }} />
                 </div>
                 <div className={styles.hostMeta}>
-                  <div style={{ fontSize: tokens.fontSizeBase200, fontWeight: tokens.fontWeightSemibold }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase200,
+                      fontWeight: tokens.fontWeightSemibold,
+                    }}
+                  >
                     {host.IP || "Unknown"}
                   </div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3 }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                    }}
+                  >
                     {host.MAC || "No MAC"}
                   </div>
                 </div>
                 <Badge appearance="tint" size="small">
                   {formatBytes(host.BytesIn + host.BytesOut)}
                 </Badge>
-                <ChevronRight24Regular style={{ fontSize: "14px", color: tokens.colorNeutralForeground3 }} />
+                <ChevronRight24Regular
+                  style={{
+                    fontSize: "14px",
+                    color: tokens.colorNeutralForeground3,
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -239,25 +272,45 @@ export const HostsView = () => {
                 <div className={styles.emptyTitle}>No host selected</div>
               </div>
               <div className={styles.emptyBody}>
-                Select a host from the list to view its traffic profile, active connections,
-                bandwidth history, and associated alerts.
+                Select a host from the list to view its traffic profile, active
+                connections, bandwidth history, and associated alerts.
               </div>
             </>
           )}
           {selectedHost && (
             <div style={{ width: "100%", padding: tokens.spacingHorizontalL }}>
-              <Title2 style={{ marginBottom: tokens.spacingVerticalL }}>{selectedHost.IP}</Title2>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: tokens.spacingVerticalM }}>
+              <Title2 style={{ marginBottom: tokens.spacingVerticalL }}>
+                {selectedHost.IP}
+              </Title2>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: tokens.spacingVerticalM,
+                }}
+              >
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     MAC Address
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
-                    {selectedHost.MAC || "—"}
+                    {selectedHost.MAC || "-"}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Vendor
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -265,7 +318,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Bytes Sent
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -273,7 +332,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Bytes Received
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -281,7 +346,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Packets Sent
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -289,7 +360,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Packets Received
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -297,7 +374,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     First Seen
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
@@ -305,7 +388,13 @@ export const HostsView = () => {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: tokens.fontSizeBase100, color: tokens.colorNeutralForeground3, marginBottom: tokens.spacingVerticalXXS }}>
+                  <div
+                    style={{
+                      fontSize: tokens.fontSizeBase100,
+                      color: tokens.colorNeutralForeground3,
+                      marginBottom: tokens.spacingVerticalXXS,
+                    }}
+                  >
                     Last Seen
                   </div>
                   <div style={{ fontSize: tokens.fontSizeBase300 }}>
