@@ -10,22 +10,29 @@ import { SettingsView } from "./SettingsView";
 export const ViewRenderer = () => {
   const activeView = useNavigationStore((state) => state.activeView);
 
-  switch (activeView) {
-    case "dashboard":
-      return <DashboardView />;
-    case "connections":
-      return <ConnectionsView />;
-    case "hosts":
-      return <HostsView />;
-    case "protocols":
-      return <ProtocolsView />;
-    case "alerts":
-      return <AlertsView />;
-    case "sessions":
-      return <SessionsView />;
-    case "settings":
-      return <SettingsView />;
-    default:
-      return <DashboardView />;
-  }
+  return (
+    <>
+      <div style={{ display: activeView === "dashboard" ? "block" : "none" }}>
+        <DashboardView />
+      </div>
+      <div style={{ display: activeView === "connections" ? "block" : "none" }}>
+        <ConnectionsView />
+      </div>
+      <div style={{ display: activeView === "hosts" ? "block" : "none" }}>
+        <HostsView />
+      </div>
+      <div style={{ display: activeView === "protocols" ? "block" : "none" }}>
+        <ProtocolsView />
+      </div>
+      <div style={{ display: activeView === "alerts" ? "block" : "none" }}>
+        <AlertsView />
+      </div>
+      <div style={{ display: activeView === "sessions" ? "block" : "none" }}>
+        <SessionsView />
+      </div>
+      <div style={{ display: activeView === "settings" ? "block" : "none" }}>
+        <SettingsView />
+      </div>
+    </>
+  );
 };
