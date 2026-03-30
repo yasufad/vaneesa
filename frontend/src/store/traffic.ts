@@ -1,24 +1,5 @@
 import { create } from "zustand";
-
-// TrafficSnapshot matches the Go struct from internal/types/types.go
-// These types are received via Wails events, not service calls, so they're
-// not in the auto-generated bindings. Field names match Go's JSON serialisation.
-interface ProtocolStats {
-  Protocol: number;
-  Bytes: number;
-  Packets: number;
-}
-
-interface TrafficSnapshot {
-  IntervalStart: string;
-  IntervalEnd: string;
-  BytesIn: number;
-  BytesOut: number;
-  PacketsIn: number;
-  PacketsOut: number;
-  ProtocolStats: ProtocolStats[];
-  OverflowDrops: number;
-}
+import { TrafficSnapshot } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 
 interface TrafficStore {
   currentSnapshot: TrafficSnapshot | null;
