@@ -1,9 +1,4 @@
-import {
-  makeStyles,
-  tokens,
-  Title2,
-  Card,
-} from "@fluentui/react-components";
+import { makeStyles, tokens, Title2, Card } from "@fluentui/react-components";
 import {
   ArrowDownload24Regular,
   ArrowUpload24Regular,
@@ -11,6 +6,7 @@ import {
   Desktop24Regular,
 } from "@fluentui/react-icons";
 import { CaptureControl } from "../components/CaptureControl";
+import { useTrafficStore } from "../store/traffic";
 
 const useStyles = makeStyles({
   root: {
@@ -150,13 +146,6 @@ const useStyles = makeStyles({
   },
 });
 
-const METRICS = [
-  { label: "Bytes In / s",          Icon: ArrowDownload24Regular },
-  { label: "Bytes Out / s",         Icon: ArrowUpload24Regular   },
-  { label: "Active Connections",    Icon: PlugConnected24Regular },
-  { label: "Discovered Hosts",      Icon: Desktop24Regular       },
-] as const;
-
 // Varying widths give placeholder rows a realistic feel
 const TALKER_ROWS = [
   ["72%", "78%", "60%", "85%"],
@@ -167,51 +156,128 @@ const TALKER_ROWS = [
 ];
 
 const ALERT_ROWS = [
-  { dot: tokens.colorPaletteRedForeground1,    w1: "78%", w2: "55%" },
+  { dot: tokens.colorPaletteRedForeground1, w1: "78%", w2: "55%" },
   { dot: tokens.colorPaletteYellowForeground1, w1: "65%", w2: "48%" },
   { dot: tokens.colorPaletteYellowForeground1, w1: "88%", w2: "50%" },
-  { dot: tokens.colorNeutralForeground3,        w1: "70%", w2: "62%" },
+  { dot: tokens.colorNeutralForeground3, w1: "70%", w2: "62%" },
 ];
 
 export const DashboardView = () => {
   const styles = useStyles();
+  const currentSnapshot = useTrafficStore((state) => state.currentSnapshot);
+
+  const formatBytes = (bytes: number) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+  };
+
+  const formatNumber = (num: number) => {
+    return num.toLocaleString();
+  };
+
+  const bytesIn = currentSnapshot?.BytesIn ?? 0;
+  const bytesOut = currentSnapshot?.BytesOut ?? 0;
+  const activeFlows = currentSnapshot?.FlowDeltas.filter((f) => !f.Closed).length ?? 0;
+  const uniqueHosts = currentSnapshot
+    ? new Set([
+        ...currentSnapshot.FlowDeltas.map((f) => f.Key.SrcIP.join(".")),
+        ...currentSnapshot.FlowDeltas.map((f) => f.Key.DstIP.join(".")),
+      ]).size
+    : 0;
+
+  const hasData = currentSnapshot !== null;
 
   return (
     <div className={styles.root}>
       <div>
         <Title2>Dashboard</Title2>
-        <div style={{ color: tokens.colorNeutralForeground3, fontSize: tokens.fontSizeBase200, marginTop: tokens.spacingVerticalXXS }}>
-          Real-time network traffic overview — start a capture session to populate this view.
+        <div
+          style={{
+            color: tokens.colorNeutralForeground3,
+            fontSize: tokens.fontSizeBase200,
+            marginTop: tokens.spacingVerticalXXS,
+          }}
+        >
+          Real-time network traffic overview, start a capture session to
+          populate this view.
         </div>
       </div>
 
       <CaptureControl />
 
       <div className={styles.metricsGrid}>
-        {METRICS.map(({ label, Icon }) => (
-          <Card key={label} className={styles.metricCard}>
-            <div className={styles.metricLabel}>
-              <Icon style={{ fontSize: "14px" }} />
-              <span>{label}</span>
-            </div>
-            <div className={styles.metricValue}>—</div>
-            <div className={styles.metricNote}>No active capture</div>
-          </Card>
-        ))}
+        <Card className={styles.metricCard}>
+          <div className={styles.metricLabel}>
+            <ArrowDownload24Regular style={{ fontSize: "14px" }} />
+            <span>Bytes In / s</span>
+          </div>
+          <div className={styles.metricValue}>
+            {hasData ? formatBytes(bytesIn) : "—"}
+          </div>
+          <div className={styles.metricNote}>
+            {hasData ? `${formatNumber(currentSnapshot.PacketsIn)} packets` : "No active capture"}
+          </div>
+        </Card>
+
+        <Card className={styles.metricCard}>
+          <div className={styles.metricLabel}>
+            <ArrowUpload24Regular style={{ fontSize: "14px" }} />
+            <span>Bytes Out / s</span>
+          </div>
+          <div className={styles.metricValue}>
+            {hasData ? formatBytes(bytesOut) : "—"}
+          </div>
+          <div className={styles.metricNote}>
+            {hasData ? `${formatNumber(currentSnapshot.PacketsOut)} packets` : "No active capture"}
+          </div>
+        </Card>
+
+        <Card className={styles.metricCard}>
+          <div className={styles.metricLabel}>
+            <PlugConnected24Regular style={{ fontSize: "14px" }} />
+            <span>Active Connections</span>
+          </div>
+          <div className={styles.metricValue}>
+            {hasData ? formatNumber(activeFlows) : "—"}
+          </div>
+          <div className={styles.metricNote}>
+            {hasData ? "flows" : "No active capture"}
+          </div>
+        </Card>
+
+        <Card className={styles.metricCard}>
+          <div className={styles.metricLabel}>
+            <Desktop24Regular style={{ fontSize: "14px" }} />
+            <span>Discovered Hosts</span>
+          </div>
+          <div className={styles.metricValue}>
+            {hasData ? formatNumber(uniqueHosts) : "—"}
+          </div>
+          <div className={styles.metricNote}>
+            {hasData ? "unique IPs" : "No active capture"}
+          </div>
+        </Card>
       </div>
 
       <div className={styles.chartsRow}>
         <Card className={styles.chartCard}>
           <span className={styles.chartTitle}>Bandwidth — Last 2 Minutes</span>
           <div className={styles.chartArea}>
-            Time-series bandwidth graph will render here.<br />
-            <span style={{ opacity: 0.7 }}>Bytes/s inbound vs. outbound at 1-second resolution.</span>
+            Time-series bandwidth graph will render here.
+            <br />
+            <span style={{ opacity: 0.7 }}>
+              Bytes/s inbound vs. outbound at 1-second resolution.
+            </span>
           </div>
         </Card>
         <Card className={styles.chartCard}>
           <span className={styles.chartTitle}>Protocol Distribution</span>
           <div className={styles.chartArea}>
-            Pie chart will render here.<br />
+            Pie chart will render here.
+            <br />
             <span style={{ opacity: 0.7 }}>TCP · UDP · ICMP · DNS · ARP</span>
           </div>
         </Card>
@@ -230,7 +296,11 @@ export const DashboardView = () => {
             {TALKER_ROWS.map((widths, i) => (
               <div key={i} className={styles.skeletonGridRow}>
                 {widths.map((w, j) => (
-                  <div key={j} className={styles.skeletonBar} style={{ width: w }} />
+                  <div
+                    key={j}
+                    className={styles.skeletonBar}
+                    style={{ width: w }}
+                  />
                 ))}
               </div>
             ))}
@@ -242,10 +312,21 @@ export const DashboardView = () => {
           <div className={styles.skeletonList}>
             {ALERT_ROWS.map(({ dot, w1, w2 }, i) => (
               <div key={i} className={styles.alertRow}>
-                <div style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: dot, flexShrink: 0 }} />
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    backgroundColor: dot,
+                    flexShrink: 0,
+                  }}
+                />
                 <div className={styles.alertBody}>
                   <div className={styles.skeletonBar} style={{ width: w1 }} />
-                  <div className={styles.skeletonBar} style={{ width: w2, height: "9px", opacity: 0.6 }} />
+                  <div
+                    className={styles.skeletonBar}
+                    style={{ width: w2, height: "9px", opacity: 0.6 }}
+                  />
                 </div>
                 <div className={styles.skeletonBar} style={{ width: "54px" }} />
               </div>
