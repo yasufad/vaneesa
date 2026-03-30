@@ -204,7 +204,9 @@ func (s *CaptureService) runPipeline(iface, filter string, promiscuous bool) {
 	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
-		agg.Run(ctx, parsedChan, s.onSnapshot)
+		agg.Run(ctx, parsedChan, func(snap *types.TrafficSnapshot) {
+			s.onSnapshot(snap, agg)
+		})
 	}()
 
 	s.mu.Lock()
@@ -220,7 +222,7 @@ func (s *CaptureService) runPipeline(iface, filter string, promiscuous bool) {
 
 // onSnapshot is called by the Aggregator on each 1-second tick. It runs the
 // Detector, persists data to the database, and emits the snapshot to the frontend.
-func (s *CaptureService) onSnapshot(snap *types.TrafficSnapshot) {
+func (s *CaptureService) onSnapshot(snap *types.TrafficSnapshot, agg *aggregator.Aggregator) {
 	// Run anomaly detection
 	thresholds, err := s.database.GetSettings()
 	if err != nil {
@@ -244,6 +246,87 @@ func (s *CaptureService) onSnapshot(snap *types.TrafficSnapshot) {
 	if err := s.database.InsertSnapshot(s.sessionID, snap); err != nil {
 		// Log but don't fail the pipeline
 		_ = err
+	}
+
+	// Persist flows - get active flows from aggregator and upsert to database
+	flows := agg.GetActiveFlows()
+	for i := range flows {
+		if _, err := s.database.UpsertFlow(&flows[i]); err != nil {
+			// Log but don't fail the pipeline
+			_ = err
+		}
+	}
+
+	// Persist hosts - extract from ARP events and flows
+	hostMap := make(map[string]*types.HostRecord)
+
+	// Extract hosts from ARP events (provides MAC addresses)
+	for _, arp := range snap.ARPEvents {
+		if arp.SenderIP != nil {
+			key := arp.SenderIP.String()
+			if _, exists := hostMap[key]; !exists {
+				hostMap[key] = &types.HostRecord{
+					SessionID: s.sessionID,
+					IP:        arp.SenderIP,
+					MAC:       arp.SenderMAC,
+					FirstSeen: snap.IntervalStart,
+					LastSeen:  snap.IntervalEnd,
+				}
+			}
+		}
+	}
+
+	// Extract hosts from flows (provides traffic stats)
+	for i := range flows {
+		f := &flows[i]
+
+		// Source host
+		if f.SrcIP != nil {
+			key := f.SrcIP.String()
+			host, exists := hostMap[key]
+			if !exists {
+				host = &types.HostRecord{
+					SessionID: s.sessionID,
+					IP:        f.SrcIP,
+					FirstSeen: f.StartedAt,
+					LastSeen:  f.LastSeenAt,
+				}
+				hostMap[key] = host
+			}
+			host.BytesOut += f.BytesOut
+			host.PacketsOut += f.PacketsOut
+			if f.LastSeenAt.After(host.LastSeen) {
+				host.LastSeen = f.LastSeenAt
+			}
+		}
+
+		// Destination host
+		if f.DstIP != nil {
+			key := f.DstIP.String()
+			host, exists := hostMap[key]
+			if !exists {
+				host = &types.HostRecord{
+					SessionID: s.sessionID,
+					IP:        f.DstIP,
+					FirstSeen: f.StartedAt,
+					LastSeen:  f.LastSeenAt,
+				}
+				hostMap[key] = host
+			}
+			host.BytesIn += f.BytesIn
+			host.PacketsIn += f.PacketsIn
+			if f.LastSeenAt.After(host.LastSeen) {
+				host.LastSeen = f.LastSeenAt
+			}
+		}
+	}
+
+	// Upsert all discovered hosts
+	for _, host := range hostMap {
+		if err := s.database.UpsertHost(host); err != nil {
+			// Log but don't fail the pipeline
+			_ = err
+		}
 	}
 
 	// Emit snapshot to frontend
