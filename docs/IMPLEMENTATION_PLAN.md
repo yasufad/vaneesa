@@ -59,20 +59,28 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 4: The Capture Pipeline Core
 *Goal: The most critical phase: reading bytes off the network interface.*
 
-1. **Pcap Integration:** Write the goroutine that uses `gopacket` / `pcap` to open an interface.
-2. **Packet Processor:** Build the pool of decoders that extract L3/L4 metadata into `ParsedPacket` structs.
-3. **Traffic Aggregator:** Implement the 1000ms ticker that converts `ParsedPacket` streams into a unified `TrafficSnapshot`.
-4. **Connect to Frontend:** Bind the frontend store directly to the `vaneesa:snapshot` events coming from the Go backend Emitter.
+**Status: ✅ Complete**
+
+1. **Pcap Integration:** ✅ Implemented `internal/capture` package with `gopacket`/`pcap` for live interface capture with BPF filtering and promiscuous mode support.
+2. **Packet Processor:** ✅ Built worker pool in `internal/processor` that decodes packets into `ParsedPacket` structs with L3/L4 metadata extraction.
+3. **Traffic Aggregator:** ✅ Implemented `internal/aggregator` with 1-second ticker that produces `TrafficSnapshot` with flow tracking, protocol stats, and application-layer event extraction.
+4. **Anomaly Detector:** ✅ Implemented `internal/detector` with four detection rules (Rate Spikes, Port Scans, SYN Floods, New Hosts) that analyse snapshots and emit alerts.
+5. **CaptureService:** ✅ Orchestrates the four-stage pipeline (Capture → Processor → Aggregator → Detector) with lifecycle management and Wails event emission.
+6. **Frontend Stores:** ✅ Created Zustand stores for capture state, traffic snapshots, and settings with proper Wails bindings integration.
+7. **Event System:** ✅ Wired Wails events (`vaneesa:status`, `vaneesa:snapshot`, `vaneesa:alert`) to frontend stores for real-time updates.
 
 ---
 
-## Phase 5: Anomaly Detection
-*Goal: Bring intelligence to the raw traffic data.*
+## Phase 5: Frontend UI Implementation
+*Goal: Build the actual UI components for capture control and data visualisation.*
 
-1. **Detector Ticker:** Insert the Detector logic between the Aggregator and the Emitter.
-2. **The 4 Rules:** Implement Rate Spikes, Port Scans, SYN Floods, and New Host logic.
-3. **Alert Pushing:** Push alerts via DB saves and real-time Wails events.
-4. **Alert UI Remediation:** Test the badge counts and notification handling in the frontend.
+1. **Capture Control UI:** Implement start/stop capture controls with interface selection and filter configuration.
+2. **Dashboard View:** Build real-time traffic visualisation with charts and metrics.
+3. **Connections View:** Implement flow table with sorting, filtering, and pagination.
+4. **Hosts View:** Build host discovery table with traffic statistics.
+5. **Protocols View:** Implement protocol breakdown visualisation.
+6. **Alerts View:** Build alert list with severity filtering and acknowledgement.
+7. **Sessions View:** Implement session history with replay capability.
 
 ---
 
