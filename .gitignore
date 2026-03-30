@@ -8,3 +8,6 @@ build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
 frontend/bindings/
 package-lock.json
 wails_windows_amd64.syso
+
+.qwen
+.kiro
