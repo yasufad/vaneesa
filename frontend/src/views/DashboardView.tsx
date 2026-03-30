@@ -10,6 +10,7 @@ import {
   PlugConnected24Regular,
   Desktop24Regular,
 } from "@fluentui/react-icons";
+import { CaptureControl } from "../components/CaptureControl";
 
 const useStyles = makeStyles({
   root: {
@@ -183,6 +184,8 @@ export const DashboardView = () => {
           Real-time network traffic overview — start a capture session to populate this view.
         </div>
       </div>
+
+      <CaptureControl />
 
       <div className={styles.metricsGrid}>
         {METRICS.map(({ label, Icon }) => (
