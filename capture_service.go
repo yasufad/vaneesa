@@ -129,6 +129,9 @@ func (s *CaptureService) StopCapture() error {
 	s.iface = ""
 	s.mu.Unlock()
 
+	// Emit final status to frontend
+	s.app.Event.Emit("vaneesa:status", s.CaptureStatus())
+
 	return nil
 }
 
