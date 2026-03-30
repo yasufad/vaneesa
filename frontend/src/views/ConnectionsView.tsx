@@ -1,20 +1,21 @@
+import { useEffect, useState } from "react";
 import {
   makeStyles,
   tokens,
   Title2,
   Card,
   Input,
-  Button,
   Dropdown,
   Option,
   Badge,
 } from "@fluentui/react-components";
 import {
   Search24Regular,
-  Filter24Regular,
-  Pause24Regular,
   PlugConnected24Regular,
 } from "@fluentui/react-icons";
+import { useCaptureStore } from "../store/capture";
+import * as FlowService from "../../bindings/github.com/yasufad/vaneesa/flowservice";
+import { FlowRecord, Protocol } from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 
 const useStyles = makeStyles({
   root: {
@@ -106,39 +107,111 @@ const useStyles = makeStyles({
   },
 });
 
-// Skeleton rows with varied widths to simulate real IP/port data
-const SKELETON_ROWS = [
-  { widths: ["78%", "82%", "55%", "65%", "70%", "60%", "50%"], proto: "TCP" },
-  { widths: ["65%", "72%", "100%", "80%", "55%", "75%", "70%"], proto: "UDP" },
-  { widths: ["88%", "60%", "55%", "65%", "80%", "55%", "60%"], proto: "TCP" },
-  { widths: ["70%", "85%", "100%", "55%", "65%", "80%", "45%"], proto: "DNS" },
-  { widths: ["82%", "68%", "55%", "70%", "72%", "65%", "55%"], proto: "TCP" },
-  { widths: ["60%", "78%", "100%", "80%", "58%", "70%", "65%"], proto: "UDP" },
-  { widths: ["75%", "65%", "55%", "65%", "85%", "60%", "50%"], proto: "TCP" },
-  { widths: ["90%", "70%", "100%", "55%", "62%", "78%", "60%"], proto: "ICMP" },
-];
-
-const PROTO_COLOURS: Record<string, string> = {
-  TCP:  tokens.colorPaletteGreenForeground1,
-  UDP:  tokens.colorPaletteBlueForeground2,
-  DNS:  tokens.colorPalettePurpleForeground2,
-  ICMP: tokens.colorPaletteYellowForeground1,
-};
-
 export const ConnectionsView = () => {
   const styles = useStyles();
+  const { status } = useCaptureStore();
+  const [flows, setFlows] = useState<FlowRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchFilter, setSearchFilter] = useState("");
+  const [protocolFilter, setProtocolFilter] = useState<string>("all");
+
+  useEffect(() => {
+    if (status.SessionID === 0) {
+      setFlows([]);
+      return;
+    }
+
+    const loadFlows = async () => {
+      setLoading(true);
+      try {
+        const result = await FlowService.GetPagedFlows(status.SessionID, 0, 100);
+        setFlows(result?.Flows || []);
+      } catch (err) {
+        console.error("Failed to load flows:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFlows();
+    const interval = setInterval(loadFlows, 2000);
+    return () => clearInterval(interval);
+  }, [status.SessionID]);
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const formatDuration = (started: string, lastSeen: string): string => {
+    const start = new Date(started).getTime();
+    const end = new Date(lastSeen).getTime();
+    const seconds = Math.floor((end - start) / 1000);
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    return `${Math.floor(minutes / 60)}h`;
+  };
+
+  const getProtocolName = (proto: Protocol): string => {
+    switch (proto) {
+      case Protocol.ProtoTCP: return "TCP";
+      case Protocol.ProtoUDP: return "UDP";
+      case Protocol.ProtoICMP: return "ICMP";
+      case Protocol.ProtoICMPv6: return "ICMPv6";
+      case Protocol.ProtoARP: return "ARP";
+      default: return "Other";
+    }
+  };
+
+  const getProtocolColour = (proto: Protocol): string => {
+    switch (proto) {
+      case Protocol.ProtoTCP: return tokens.colorPaletteGreenForeground1;
+      case Protocol.ProtoUDP: return tokens.colorPaletteBlueForeground2;
+      case Protocol.ProtoICMP: return tokens.colorPaletteYellowForeground1;
+      case Protocol.ProtoICMPv6: return tokens.colorPalettePurpleForeground2;
+      default: return tokens.colorNeutralForeground3;
+    }
+  };
+
+  const filteredFlows = flows.filter((flow) => {
+    const matchesSearch = searchFilter === "" ||
+      flow.SrcIP?.includes(searchFilter) ||
+      flow.DstIP?.includes(searchFilter) ||
+      flow.SrcPort?.toString().includes(searchFilter) ||
+      flow.DstPort?.toString().includes(searchFilter);
+
+    const matchesProtocol = protocolFilter === "all" ||
+      (protocolFilter === "tcp" && flow.Protocol === Protocol.ProtoTCP) ||
+      (protocolFilter === "udp" && flow.Protocol === Protocol.ProtoUDP) ||
+      (protocolFilter === "icmp" && (flow.Protocol === Protocol.ProtoICMP || flow.Protocol === Protocol.ProtoICMPv6));
+
+    return matchesSearch && matchesProtocol;
+  });
+
+  const hasActiveCapture = status.SessionID !== 0;
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
         <div className={styles.titleGroup}>
           <Title2>Connections</Title2>
-          <Badge appearance="filled" color="informative" size="medium">
-            Live
-          </Badge>
+          {hasActiveCapture && (
+            <Badge appearance="filled" color="success" size="medium">
+              Live
+            </Badge>
+          )}
         </div>
-        <span style={{ fontSize: tokens.fontSizeBase200, color: tokens.colorNeutralForeground3 }}>
-          No active capture — flows will appear here once monitoring begins.
+        <span
+          style={{
+            fontSize: tokens.fontSizeBase200,
+            color: tokens.colorNeutralForeground3,
+          }}
+        >
+          {hasActiveCapture
+            ? `${filteredFlows.length} active flows`
+            : "No active capture — flows will appear here once monitoring begins."}
         </span>
       </div>
 
@@ -148,25 +221,21 @@ export const ConnectionsView = () => {
           placeholder="Filter by IP address or port…"
           contentBefore={<Search24Regular style={{ fontSize: "16px" }} />}
           size="small"
+          value={searchFilter}
+          onChange={(_, data) => setSearchFilter(data.value)}
         />
-        <Dropdown placeholder="Protocol" size="small" style={{ minWidth: "110px" }}>
-          <Option>All protocols</Option>
-          <Option>TCP</Option>
-          <Option>UDP</Option>
-          <Option>ICMP</Option>
-          <Option>DNS</Option>
+        <Dropdown
+          placeholder="Protocol"
+          size="small"
+          style={{ minWidth: "110px" }}
+          value={protocolFilter === "all" ? "All protocols" : protocolFilter.toUpperCase()}
+          onOptionSelect={(_, data) => setProtocolFilter(data.optionValue as string)}
+        >
+          <Option value="all" text="All protocols">All protocols</Option>
+          <Option value="tcp" text="TCP">TCP</Option>
+          <Option value="udp" text="UDP">UDP</Option>
+          <Option value="icmp" text="ICMP">ICMP</Option>
         </Dropdown>
-        <Dropdown placeholder="Sort by" size="small" style={{ minWidth: "120px" }}>
-          <Option>Bytes (desc)</Option>
-          <Option>Duration (desc)</Option>
-          <Option>Source IP</Option>
-          <Option>Destination IP</Option>
-        </Dropdown>
-        <Button icon={<Filter24Regular />} size="small" appearance="subtle">Filters</Button>
-        <div style={{ flex: 1 }} />
-        <Button icon={<Pause24Regular />} size="small" appearance="outline" disabled>
-          Pause updates
-        </Button>
       </div>
 
       <Card className={styles.tableCard}>
@@ -181,31 +250,44 @@ export const ConnectionsView = () => {
         </div>
 
         <div className={styles.rowList}>
-          {SKELETON_ROWS.map(({ widths, proto }, i) => (
-            <div key={i} className={styles.tableRow}>
-              {widths.slice(0, 4).map((w, j) => (
-                <div key={j} className={styles.skeletonBar} style={{ width: w }} />
-              ))}
+          {!hasActiveCapture && (
+            <div className={styles.emptyHint}>
+              <PlugConnected24Regular
+                style={{ fontSize: "32px", opacity: 0.3 }}
+              />
+              <span style={{ fontSize: tokens.fontSizeBase200 }}>
+                Start a capture session to begin tracking live network flows.
+              </span>
+            </div>
+          )}
+
+          {hasActiveCapture && filteredFlows.length === 0 && !loading && (
+            <div className={styles.emptyHint}>
+              <span style={{ fontSize: tokens.fontSizeBase200 }}>
+                No flows match the current filters.
+              </span>
+            </div>
+          )}
+
+          {filteredFlows.map((flow) => (
+            <div key={flow.ID} className={styles.tableRow}>
+              <span>{flow.SrcIP || "—"}</span>
+              <span>{flow.DstIP || "—"}</span>
+              <span>{flow.SrcPort || "—"}</span>
+              <span>{flow.DstPort || "—"}</span>
               <div>
                 <Badge
                   appearance="tint"
                   size="small"
-                  style={{ color: PROTO_COLOURS[proto] }}
+                  style={{ color: getProtocolColour(flow.Protocol) }}
                 >
-                  {proto}
+                  {getProtocolName(flow.Protocol)}
                 </Badge>
               </div>
-              <div className={styles.skeletonBar} style={{ width: widths[5] }} />
-              <div className={styles.skeletonBar} style={{ width: widths[6] }} />
+              <span>{formatBytes(flow.BytesIn + flow.BytesOut)}</span>
+              <span>{formatDuration(flow.StartedAt, flow.LastSeenAt)}</span>
             </div>
           ))}
-
-          <div className={styles.emptyHint}>
-            <PlugConnected24Regular style={{ fontSize: "32px", opacity: 0.3 }} />
-            <span style={{ fontSize: tokens.fontSizeBase200 }}>
-              Start a capture session to begin tracking live network flows.
-            </span>
-          </div>
         </div>
       </Card>
     </div>
