@@ -178,7 +178,7 @@ func scanSession(row *sql.Row) (*types.Session, error) {
 //
 
 // UpsertFlow inserts a new flow or updates counters on an existing one.
-// It uses SQLite's INSERT OR REPLACE semantics via UPSERT to handle the case
+// It uses SQLite's INSERT ... ON CONFLICT DO UPDATE to handle the case
 // where a flow was inserted in a previous call and is now accumulating more bytes.
 func (d *DB) UpsertFlow(f *types.FlowRecord) (int64, error) {
 	srcIP := ""
@@ -190,40 +190,31 @@ func (d *DB) UpsertFlow(f *types.FlowRecord) (int64, error) {
 		dstIP = f.DstIP.String()
 	}
 
-	if f.ID == 0 {
-		// First time writing this flow
-		res, err := d.db.Exec(`
-			INSERT INTO flows(
-				session_id, src_ip, dst_ip, src_port, dst_port, protocol,
-				bytes_in, bytes_out, packets_in, packets_out,
-				started_at, last_seen_at, closed
-			) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-			f.SessionID, srcIP, dstIP,
-			f.SrcPort, f.DstPort, int(f.Protocol),
-			f.BytesIn, f.BytesOut, f.PacketsIn, f.PacketsOut,
-			encodeTime(f.StartedAt), encodeTime(f.LastSeenAt),
-			boolToInt(f.Closed),
-		)
-		if err != nil {
-			return 0, fmt.Errorf("UpsertFlow insert: %w", err)
-		}
-		return res.LastInsertId()
-	}
-
-	// Update existing row
-	_, err := d.db.Exec(`
-		UPDATE flows SET
-			bytes_in=?, bytes_out=?, packets_in=?, packets_out=?,
-			last_seen_at=?, closed=?
-		WHERE id=?`,
+	// Use UPSERT to insert or update based on the unique flow key
+	res, err := d.db.Exec(`
+		INSERT INTO flows(
+			session_id, src_ip, dst_ip, src_port, dst_port, protocol,
+			bytes_in, bytes_out, packets_in, packets_out,
+			started_at, last_seen_at, closed
+		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
+		ON CONFLICT(session_id, src_ip, dst_ip, src_port, dst_port, protocol)
+		DO UPDATE SET
+			bytes_in = bytes_in + excluded.bytes_in,
+			bytes_out = bytes_out + excluded.bytes_out,
+			packets_in = packets_in + excluded.packets_in,
+			packets_out = packets_out + excluded.packets_out,
+			last_seen_at = excluded.last_seen_at,
+			closed = excluded.closed`,
+		f.SessionID, srcIP, dstIP,
+		f.SrcPort, f.DstPort, int(f.Protocol),
 		f.BytesIn, f.BytesOut, f.PacketsIn, f.PacketsOut,
-		encodeTime(f.LastSeenAt), boolToInt(f.Closed),
-		f.ID,
+		encodeTime(f.StartedAt), encodeTime(f.LastSeenAt),
+		boolToInt(f.Closed),
 	)
 	if err != nil {
-		return 0, fmt.Errorf("UpsertFlow update(%d): %w", f.ID, err)
+		return 0, fmt.Errorf("UpsertFlow: %w", err)
 	}
-	return f.ID, nil
+	return res.LastInsertId()
 }
 
 // GetPagedFlows returns a page of flows for a session ordered by total bytes
