@@ -42,6 +42,7 @@ func main() {
 	app.RegisterService(application.NewService(NewSettingsService(database)))
 	app.RegisterService(application.NewService(NewSessionService(database)))
 	app.RegisterService(application.NewService(NewCaptureService(app, database)))
+	app.RegisterService(application.NewService(NewFlowService(app, database)))
 
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "Vaneesa",
