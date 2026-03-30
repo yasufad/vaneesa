@@ -1,9 +1,4 @@
-import {
-  makeStyles,
-  tokens,
-  Title2,
-  Card,
-} from "@fluentui/react-components";
+import { makeStyles, tokens, Title2, Card } from "@fluentui/react-components";
 import { ProtocolHandler24Regular } from "@fluentui/react-icons";
 import { useCaptureStore } from "../store/capture";
 import { useTrafficStore } from "../store/traffic";
@@ -150,34 +145,51 @@ export const ProtocolsView = () => {
 
   const getProtocolName = (proto: Protocol): string => {
     switch (proto) {
-      case Protocol.ProtoTCP: return "TCP";
-      case Protocol.ProtoUDP: return "UDP";
-      case Protocol.ProtoICMP: return "ICMP";
-      case Protocol.ProtoICMPv6: return "ICMPv6";
-      case Protocol.ProtoARP: return "ARP";
-      default: return "Other";
+      case Protocol.ProtoTCP:
+        return "TCP";
+      case Protocol.ProtoUDP:
+        return "UDP";
+      case Protocol.ProtoICMP:
+        return "ICMP";
+      case Protocol.ProtoICMPv6:
+        return "ICMPv6";
+      case Protocol.ProtoARP:
+        return "ARP";
+      default:
+        return "Other";
     }
   };
 
   const getProtocolColour = (proto: Protocol): string => {
     switch (proto) {
-      case Protocol.ProtoTCP: return tokens.colorPaletteGreenBackground2;
-      case Protocol.ProtoUDP: return tokens.colorPaletteBlueForeground2;
-      case Protocol.ProtoICMP: return tokens.colorPaletteYellowBackground2;
-      case Protocol.ProtoICMPv6: return tokens.colorPalettePurpleBackground2;
-      case Protocol.ProtoARP: return tokens.colorPaletteRedBackground2;
-      default: return tokens.colorNeutralBackground5;
+      case Protocol.ProtoTCP:
+        return tokens.colorPaletteGreenBackground2;
+      case Protocol.ProtoUDP:
+        return tokens.colorPaletteBlueForeground2;
+      case Protocol.ProtoICMP:
+        return tokens.colorPaletteYellowBackground2;
+      case Protocol.ProtoICMPv6:
+        return tokens.colorPalettePurpleBackground2;
+      case Protocol.ProtoARP:
+        return tokens.colorPaletteRedBackground2;
+      default:
+        return tokens.colorNeutralBackground5;
     }
   };
 
   const formatBytes = (bytes: number): string => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    if (bytes < 1024 * 1024 * 1024)
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
   };
 
-  const totalBytes = currentSnapshot?.ProtocolStats?.reduce((sum, stat) => sum + stat.Bytes, 0) || 0;
+  const totalBytes =
+    currentSnapshot?.ProtocolStats?.reduce(
+      (sum, stat) => sum + stat.Bytes,
+      0,
+    ) || 0;
   const hasActiveCapture = status.SessionID !== 0;
 
   return (
@@ -188,7 +200,7 @@ export const ProtocolsView = () => {
           <div className={styles.subtitle}>
             {hasActiveCapture
               ? "Network activity distribution over time"
-              : "Network activity distribution over time — start a capture session to populate this view."}
+              : "Network activity distribution over time - start a capture session to populate this view."}
           </div>
         </div>
       </div>
@@ -201,10 +213,15 @@ export const ProtocolsView = () => {
           </div>
         ) : (
           <div className={styles.chartArea}>
-            <ProtocolHandler24Regular style={{ fontSize: "28px", opacity: 0.3 }} />
+            <ProtocolHandler24Regular
+              style={{ fontSize: "28px", opacity: 0.3 }}
+            />
             <span>
-              Protocol distribution chart will render here.<br />
-              <span style={{ opacity: 0.7 }}>Start a capture to see live protocol breakdown.</span>
+              Protocol distribution chart will render here.
+              <br />
+              <span style={{ opacity: 0.7 }}>
+                Start a capture to see live protocol breakdown.
+              </span>
             </span>
           </div>
         )}
@@ -214,19 +231,37 @@ export const ProtocolsView = () => {
         <span className={styles.breakdownTitle}>Protocol Breakdown</span>
 
         {!hasActiveCapture && (
-          <div style={{ padding: tokens.spacingVerticalXL, textAlign: "center", color: tokens.colorNeutralForeground3 }}>
+          <div
+            style={{
+              padding: tokens.spacingVerticalXL,
+              textAlign: "center",
+              color: tokens.colorNeutralForeground3,
+            }}
+          >
             Start a capture to see protocol statistics
           </div>
         )}
 
         {hasActiveCapture && currentSnapshot && (
           <>
-            <div style={{ display: "flex", flexDirection: "column", gap: tokens.spacingVerticalL, flexShrink: 0 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: tokens.spacingVerticalL,
+                flexShrink: 0,
+              }}
+            >
               {currentSnapshot.ProtocolStats.map((stat) => {
-                const pct = totalBytes > 0 ? ((stat.Bytes / totalBytes) * 100).toFixed(1) : "0.0";
+                const pct =
+                  totalBytes > 0
+                    ? ((stat.Bytes / totalBytes) * 100).toFixed(1)
+                    : "0.0";
                 return (
                   <div key={stat.Protocol} className={styles.protocolRow}>
-                    <span className={styles.protocolName}>{getProtocolName(stat.Protocol)}</span>
+                    <span className={styles.protocolName}>
+                      {getProtocolName(stat.Protocol)}
+                    </span>
                     <div className={styles.barTrack}>
                       <div
                         className={styles.barFill}
@@ -242,7 +277,13 @@ export const ProtocolsView = () => {
               })}
             </div>
 
-            <div style={{ height: "1px", backgroundColor: tokens.colorNeutralStroke2, marginTop: tokens.spacingVerticalS }} />
+            <div
+              style={{
+                height: "1px",
+                backgroundColor: tokens.colorNeutralStroke2,
+                marginTop: tokens.spacingVerticalS,
+              }}
+            />
 
             <div className={styles.colHeaders}>
               <span>Protocol</span>
@@ -254,10 +295,18 @@ export const ProtocolsView = () => {
 
             <div className={styles.breakdownList}>
               {currentSnapshot.ProtocolStats.map((stat) => {
-                const pct = totalBytes > 0 ? ((stat.Bytes / totalBytes) * 100).toFixed(1) : "0.0";
+                const pct =
+                  totalBytes > 0
+                    ? ((stat.Bytes / totalBytes) * 100).toFixed(1)
+                    : "0.0";
                 return (
                   <div key={stat.Protocol} className={styles.detailRow}>
-                    <span style={{ fontSize: tokens.fontSizeBase200, fontWeight: tokens.fontWeightSemibold }}>
+                    <span
+                      style={{
+                        fontSize: tokens.fontSizeBase200,
+                        fontWeight: tokens.fontWeightSemibold,
+                      }}
+                    >
                       {getProtocolName(stat.Protocol)}
                     </span>
                     <div className={styles.barTrack}>
@@ -270,8 +319,12 @@ export const ProtocolsView = () => {
                       />
                     </div>
                     <span className={styles.protocolPct}>{pct}%</span>
-                    <span style={{ fontSize: tokens.fontSizeBase200 }}>{formatBytes(stat.Bytes)}</span>
-                    <span style={{ fontSize: tokens.fontSizeBase200 }}>{stat.Packets.toLocaleString()}</span>
+                    <span style={{ fontSize: tokens.fontSizeBase200 }}>
+                      {formatBytes(stat.Bytes)}
+                    </span>
+                    <span style={{ fontSize: tokens.fontSizeBase200 }}>
+                      {stat.Packets.toLocaleString()}
+                    </span>
                   </div>
                 );
               })}
