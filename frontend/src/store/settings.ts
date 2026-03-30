@@ -1,6 +1,9 @@
 import { create } from "zustand";
 
-import { Settings, DetectorThresholds } from "../../bindings/github.com/yasufad/vaneesa/internal/db/models";
+import {
+  Settings,
+  DetectorThresholds,
+} from "../../bindings/github.com/yasufad/vaneesa/internal/types/models";
 
 interface SettingsState {
   settings: Settings;
@@ -19,11 +22,12 @@ interface SettingsState {
 
 const DEFAULT_SETTINGS = new Settings();
 const DEFAULT_THRESHOLDS = new DetectorThresholds({
-  rateSpikeMultiplier: 5,
-  rateSpikeMinimumPPS: 10,
-  portScanThreshold: 20,
-  synFloodRatio: 10,
-  synFloodMinimumSYNs: 50,
+  RateSpikeMultiplier: 5,
+  RateSpikeMinBaseline: 10,
+  PortScanDistinctPorts: 20,
+  PortScanWindowSecs: 10,
+  SYNFloodMinSYNs: 50,
+  SYNFloodRatio: 10,
 });
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
