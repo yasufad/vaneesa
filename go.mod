@@ -3,6 +3,7 @@ module github.com/yasufad/vaneesa
 go 1.25
 
 require (
+	github.com/google/gopacket v1.1.19
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.74
 	modernc.org/sqlite v1.44.3
 )
