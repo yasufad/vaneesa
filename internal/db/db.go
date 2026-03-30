@@ -227,6 +227,12 @@ var migrations = []migration{
 			value TEXT NOT NULL
 		);`,
 	},
+	{
+		id: 9,
+		sql: `
+		CREATE UNIQUE INDEX IF NOT EXISTS idx_flows_unique_key 
+		ON flows(session_id, src_ip, dst_ip, src_port, dst_port, protocol);`,
+	},
 }
 
 // migrate applies any migrations that have not yet been recorded in
