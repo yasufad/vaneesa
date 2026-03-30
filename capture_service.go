@@ -148,6 +148,18 @@ func (s *CaptureService) CaptureStatus() types.CaptureStatus {
 	}
 }
 
+// GetLatestSnapshot returns a placeholder TrafficSnapshot. This method exists
+// solely to force Wails to generate TypeScript bindings for TrafficSnapshot
+// and ProtocolStats. The frontend receives real snapshots via vaneesa:snapshot
+// events during capture; this method is not intended for production use.
+func (s *CaptureService) GetLatestSnapshot() *types.TrafficSnapshot {
+	return &types.TrafficSnapshot{
+		IntervalStart: time.Now(),
+		IntervalEnd:   time.Now(),
+		ProtocolStats: []types.ProtocolStats{},
+	}
+}
+
 // runPipeline starts all four pipeline stages and blocks until context
 // cancellation or an error occurs.
 func (s *CaptureService) runPipeline(iface, filter string, promiscuous bool) {
