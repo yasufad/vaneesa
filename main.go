@@ -4,8 +4,11 @@ import (
 	"embed"
 	_ "embed"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/yasufad/vaneesa/internal/db"
 )
 
 //go:embed all:frontend/dist
@@ -15,6 +18,12 @@ var assets embed.FS
 var appIcon []byte
 
 func main() {
+	database, err := openDatabase()
+	if err != nil {
+		log.Fatalf("failed to open database: %v", err)
+	}
+	defer database.Close()
+
 	app := application.New(application.Options{
 		Name:        "vaneesa",
 		Description: "Real-time network intelligence dashboard",
@@ -32,6 +41,8 @@ func main() {
 
 	themeService := NewThemeService(app)
 	app.RegisterService(application.NewService(themeService))
+	app.RegisterService(application.NewService(NewSettingsService(database)))
+	app.RegisterService(application.NewService(NewSessionService(database)))
 
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "Vaneesa",
@@ -45,12 +56,25 @@ func main() {
 		UseApplicationMenu: true,
 	})
 
-	// Emit initial theme after window is created
-	initialTheme := themeService.GetTheme()
-	app.Event.Emit("theme:changed", initialTheme)
+	// Emit the initial theme after the window is created so the frontend
+	// receives it before any user interaction occurs.
+	app.Event.Emit("theme:changed", themeService.GetTheme())
 
-	err := app.Run()
-	if err != nil {
+	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// openDatabase resolves the OS-appropriate data directory and opens the DB.
+// The path follows the convention documented in ARCHITECTURE.md:
+//   - Windows:  %APPDATA%\vaneesa\vaneesa.db
+//   - macOS:    ~/Library/Application Support/vaneesa/vaneesa.db
+//   - Linux:    ~/.local/share/vaneesa/vaneesa.db  (via XDG_DATA_HOME)
+func openDatabase() (*db.DB, error) {
+	dataDir, err := os.UserConfigDir()
+	if err != nil {
+		return nil, err
+	}
+	dbPath := filepath.Join(dataDir, "vaneesa", "vaneesa.db")
+	return db.Open(dbPath)
 }
