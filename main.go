@@ -4,8 +4,6 @@ import (
 	"embed"
 	_ "embed"
 	"log"
-	"os"
-	"path/filepath"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/yasufad/vaneesa/internal/db"
@@ -65,16 +63,12 @@ func main() {
 	}
 }
 
-// openDatabase resolves the OS-appropriate data directory and opens the DB.
-// The path follows the convention documented in ARCHITECTURE.md:
+// openDatabase opens the Vaneesa database at the OS-appropriate path.
+// The db package handles path resolution internally following the convention
+// documented in ARCHITECTURE.md:
 //   - Windows:  %APPDATA%\vaneesa\vaneesa.db
 //   - macOS:    ~/Library/Application Support/vaneesa/vaneesa.db
 //   - Linux:    ~/.local/share/vaneesa/vaneesa.db  (via XDG_DATA_HOME)
 func openDatabase() (*db.DB, error) {
-	dataDir, err := os.UserConfigDir()
-	if err != nil {
-		return nil, err
-	}
-	dbPath := filepath.Join(dataDir, "vaneesa", "vaneesa.db")
-	return db.Open(dbPath)
+	return db.Open()
 }
