@@ -97,7 +97,7 @@ const useStyles = makeStyles({
   },
 });
 
-// Placeholder interface options — replaced in Phase 4 when CaptureService.GetInterfaces() is wired.
+// Placeholder interface options - replaced in Phase 4 when CaptureService.GetInterfaces() is wired.
 const INTERFACE_PLACEHOLDERS = ["eth0", "wlan0", "lo0"];
 
 export const SettingsView = () => {
@@ -219,9 +219,7 @@ export const SettingsView = () => {
                   updateSettings({ Promiscuous: data.checked })
                 }
                 label={
-                  <span>
-                    {settings.Promiscuous ? "Enabled" : "Disabled"}
-                  </span>
+                  <span>{settings.Promiscuous ? "Enabled" : "Disabled"}</span>
                 }
               />
             </div>
@@ -263,8 +261,8 @@ export const SettingsView = () => {
               <p className={styles.description}>
                 Alert when a source IP's packet rate exceeds this multiple of
                 its 60-second rolling average. Lower values are more sensitive.
-                Requires a baseline of at least {thresholds.RateSpikeMinBaseline}{" "}
-                pps to activate.
+                Requires a baseline of at least{" "}
+                {thresholds.RateSpikeMinBaseline} pps to activate.
               </p>
             </div>
             <div className={styles.sliderRow}>
