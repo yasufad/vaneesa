@@ -49,3 +49,13 @@ func (s *SessionService) EndSession(id int64) error {
 func (s *SessionService) DeleteSession(id int64) error {
 	return s.database.DeleteSession(id)
 }
+
+// ExportFlowsCSV exports all flows for a session as CSV.
+func (s *SessionService) ExportFlowsCSV(sessionID int64) (string, error) {
+	return s.database.ExportFlowsCSV(sessionID)
+}
+
+// ExportFlowsJSON exports all flows for a session as JSON.
+func (s *SessionService) ExportFlowsJSON(sessionID int64) (string, error) {
+	return s.database.ExportFlowsJSON(sessionID)
+}
