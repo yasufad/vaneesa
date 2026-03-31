@@ -24,6 +24,7 @@ export function initialiseEventListeners() {
 
   // Traffic snapshots (emitted every second during capture)
   Events.On("vaneesa:snapshot", (ev) => {
+    console.log("Snapshot received:", ev.data);
     useTrafficStore.getState().updateSnapshot(ev.data);
   });
 
