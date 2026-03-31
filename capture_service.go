@@ -223,6 +223,8 @@ func (s *CaptureService) runPipeline(iface, filter string, promiscuous bool) {
 // onSnapshot is called by the Aggregator on each 1-second tick. It runs the
 // Detector, persists data to the database, and emits the snapshot to the frontend.
 func (s *CaptureService) onSnapshot(snap *types.TrafficSnapshot, agg *aggregator.Aggregator) {
+	fmt.Printf("[DEBUG] onSnapshot called: BytesIn=%d BytesOut=%d\n", snap.BytesIn, snap.BytesOut)
+
 	// Run anomaly detection
 	thresholds, err := s.database.GetSettings()
 	if err != nil {
@@ -330,5 +332,6 @@ func (s *CaptureService) onSnapshot(snap *types.TrafficSnapshot, agg *aggregator
 	}
 
 	// Emit snapshot to frontend
+	fmt.Printf("[DEBUG] Emitting snapshot event to frontend\n")
 	s.app.Event.Emit("vaneesa:snapshot", snap)
 }
