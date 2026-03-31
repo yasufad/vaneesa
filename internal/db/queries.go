@@ -199,10 +199,10 @@ func (d *DB) UpsertFlow(f *types.FlowRecord) (int64, error) {
 		) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)
 		ON CONFLICT(session_id, src_ip, dst_ip, src_port, dst_port, protocol)
 		DO UPDATE SET
-			bytes_in = bytes_in + excluded.bytes_in,
-			bytes_out = bytes_out + excluded.bytes_out,
-			packets_in = packets_in + excluded.packets_in,
-			packets_out = packets_out + excluded.packets_out,
+			bytes_in = excluded.bytes_in,
+			bytes_out = excluded.bytes_out,
+			packets_in = excluded.packets_in,
+			packets_out = excluded.packets_out,
 			last_seen_at = excluded.last_seen_at,
 			closed = excluded.closed`,
 		f.SessionID, srcIP, dstIP,
@@ -337,10 +337,10 @@ func (d *DB) UpsertHost(h *types.HostRecord) error {
 		ON CONFLICT(session_id, ip) DO UPDATE SET
 			mac        = CASE WHEN excluded.mac != '' THEN excluded.mac ELSE mac END,
 			vendor     = CASE WHEN excluded.vendor != '' THEN excluded.vendor ELSE vendor END,
-			bytes_in   = bytes_in   + excluded.bytes_in,
-			bytes_out  = bytes_out  + excluded.bytes_out,
-			packets_in = packets_in + excluded.packets_in,
-			packets_out= packets_out+ excluded.packets_out,
+			bytes_in   = excluded.bytes_in,
+			bytes_out  = excluded.bytes_out,
+			packets_in = excluded.packets_in,
+			packets_out= excluded.packets_out,
 			last_seen  = excluded.last_seen`,
 		h.SessionID, ipStr, macStr, h.Vendor,
 		h.BytesIn, h.BytesOut, h.PacketsIn, h.PacketsOut,
