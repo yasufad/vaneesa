@@ -30,6 +30,10 @@ Unicode true
 ####
 ## !define REQUEST_EXECUTION_LEVEL "admin"            # Default "admin"  see also https://nsis.sourceforge.io/Docs/Chapter4.html
 ####
+## Vaneesa requires administrator privileges for packet capture
+####
+!define REQUEST_EXECUTION_LEVEL "admin"
+####
 ## Include the wails tools
 ####
 !include "wails_tools.nsh"
@@ -53,11 +57,16 @@ ManifestDPIAware true
 !define MUI_ICON "..\icon.ico"
 !define MUI_UNICON "..\icon.ico"
 # !define MUI_WELCOMEFINISHPAGE_BITMAP "resources\leftimage.bmp" #Include this to add a bitmap on the left side of the Welcome Page. Must be a size of 164x314
+!define MUI_WELCOMEPAGE_TITLE "Welcome to Vaneesa Network Monitor Setup"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of Vaneesa.$\r$\n$\r$\nIMPORTANT: Vaneesa requires administrator privileges to capture network packets. You must run the application as administrator after installation.$\r$\n$\r$\nOn Windows, Npcap must be installed for packet capture. The installer will check for Npcap and guide you if it's missing.$\r$\n$\r$\nClick Next to continue."
 !define MUI_FINISHPAGE_NOAUTOCLOSE # Wait on the INSTFILES page so the user can take a look into the details of the installation steps
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}"
+!define MUI_FINISHPAGE_RUN_TEXT "Run Vaneesa (requires administrator privileges)"
+!define MUI_FINISHPAGE_RUN_PARAMETERS "runas"
 !define MUI_ABORTWARNING # This will warn the user if they exit from the installer.
 
 !insertmacro MUI_PAGE_WELCOME # Welcome to the installer page.
-# !insertmacro MUI_PAGE_LICENSE "resources\eula.txt" # Adds a EULA page to the installer
+!insertmacro MUI_PAGE_LICENSE "..\..\..\LICENSE" # Adds a EULA page to the installer
 !insertmacro MUI_PAGE_DIRECTORY # In which folder install page.
 !insertmacro MUI_PAGE_INSTFILES # Installing page.
 !insertmacro MUI_PAGE_FINISH # Finished installation page.
