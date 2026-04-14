@@ -2,8 +2,8 @@
 set -e
 
 # Build configuration
-APP_NAME="vaneesa.exe"
-BUNDLE_ID="com.example.vaneesa"
+APP_NAME="vaneesa"
+BUNDLE_ID="com.yasufad.vaneesa"
 VERSION="0.1.0"
 BUILD_NUMBER="0.1.0"
 BUILD_DIR="build/ios"

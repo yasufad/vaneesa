@@ -3,26 +3,26 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "vaneesa.exe"
+name: "vaneesa"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.1.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "A vaneesa application"
-vendor: "My Company"
+description: "Real-time network intelligence dashboard"
+vendor: "Fadhil"
 homepage: "https://wails.io"
 license: "MIT"
 release: "1"
 
 contents:
-  - src: "./bin/vaneesa.exe"
-    dst: "/usr/local/bin/vaneesa.exe"
+  - src: "./bin/vaneesa"
+    dst: "/usr/local/bin/vaneesa"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/vaneesa.exe.png"
-  - src: "./build/linux/vaneesa.exe.desktop"
-    dst: "/usr/share/applications/vaneesa.exe.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/vaneesa.png"
+  - src: "./build/linux/vaneesa.desktop"
+    dst: "/usr/share/applications/vaneesa.desktop"
 
 # Default dependencies for Debian 12/Ubuntu 22.04+ with WebKit 4.1
 depends:

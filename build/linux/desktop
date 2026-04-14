@@ -1,13 +1,13 @@
 [Desktop Entry]
 Version=1.0
-Name=My Product
-Comment=A vaneesa application
+Name=Vaneesa
+Comment=Real-time network intelligence dashboard
 # The Exec line includes %u to pass the URL to the application
-Exec=/usr/local/bin/vaneesa.exe %u
+Exec=/usr/local/bin/vaneesa %u
 Terminal=false
 Type=Application
-Icon=vaneesa.exe
+Icon=vaneesa
 Categories=Utility;
-StartupWMClass=vaneesa.exe
+StartupWMClass=vaneesa
 
  
