@@ -89,6 +89,14 @@ This document outlines the phased approach to building Vaneesa from the ground u
 ## Phase 6: Polish & PCAP Replay
 *Goal: Finalise workflows and add offline session support.*
 
-1. **PCAP Loader:** Implement `gopacket`'s offline PCAP reader stream, feeding into the exact same Capture Pipeline infrastructure.
-2. **Export Triggers:** Implement CSV/JSON standard exports from the Session views.
-3. **Final UI Review:** Ensure transitions, hover states, selection states, and window native resize behaviours are perfectly smooth.
+**Status: 🚧 In Progress**
+
+1. **Build System Configuration:** ✅ Complete
+   - NSIS installer configured with administrator privilege warnings
+   - Windows manifest updated with correct assembly identity
+   - Build documentation created with platform-specific packaging instructions
+   - Licence file integrated into installer
+   - Code signing configuration documented
+2. **PCAP Loader:** Implement `gopacket`'s offline PCAP reader stream, feeding into the exact same Capture Pipeline infrastructure.
+3. **Export Triggers:** Implement CSV/JSON standard exports from the Session views.
+4. **Final UI Review:** Ensure transitions, hover states, selection states, and window native resize behaviours are perfectly smooth.
