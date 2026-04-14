@@ -177,6 +177,8 @@ func (s *CaptureService) runPipeline(iface, filter string, promiscuous bool) {
 		s.state = types.StateError
 		s.errorMessage = fmt.Sprintf("failed to open capture: %v", err)
 		s.mu.Unlock()
+		// Emit error status to frontend so the UI can display the error
+		s.app.Event.Emit("vaneesa:status", s.CaptureStatus())
 		return
 	}
 
